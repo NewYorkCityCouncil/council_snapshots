@@ -22,6 +22,9 @@ sidebar <- dashboardSidebar(
 )
 
 body <- dashboardBody(
+  tags$head(
+    tags$link(rel = "stylesheet", type = "text/css", href = "council.css")
+    ),
   tabItems(
     tabItem("311_test",
             plotOutput("test_plot1")),
