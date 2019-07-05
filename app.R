@@ -7,6 +7,9 @@ library(dplyr)
 modules <- list.files(path = "modules", pattern = "\\.(R|r)$", full.names = TRUE)
 lapply(modules, source)
 
+utils <- list.files(path = "util", pattern = "\\.(R|r)$", full.names = TRUE)
+lapply(utils, source)
+
 header <- dashboardHeader(title = "Council Snapshots")
 
 sidebar <- dashboardSidebar(
