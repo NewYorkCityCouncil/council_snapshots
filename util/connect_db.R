@@ -24,3 +24,7 @@ snapshots_db <- dbPool(
   user = user,
   password = pw
 )
+
+onStop(function() {
+  poolClose(snapshots_db)
+})
