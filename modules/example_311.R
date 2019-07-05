@@ -80,10 +80,10 @@ example_311 <- function(input, output, session, coun_dist, week) {
     bbox <- as.numeric(st_bbox(dist_week()))
 
     leafletProxy("complaint_map", data = dist_week() %>% st_cast("POINT")) %>%
-      clearMarkers() %>%
+      clearGroup("complaints") %>%
       addCircleMarkers(radius = 4, stroke = FALSE, fillOpacity = .8,
                        fillColor = ~pal(complaint_type),
-                       popup = ~ complaint_type) %>%
+                       popup = ~ complaint_type, group = "complaints") %>%
       clearControls() %>%
       flyToBounds(bbox[1], bbox[2], bbox[3], bbox[4], options = list(duration = .25))
   })
