@@ -22,9 +22,7 @@ sidebar <- dashboardSidebar(
 )
 
 body <- dashboardBody(
-  tags$head(
-    tags$link(rel = "stylesheet", type = "text/css", href = "council.css")
-    ),
+  tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "council.css")),
   tabItems(
     tabItem("311_test",
             plotOutput("test_plot1")),
@@ -49,6 +47,7 @@ server <- function(input, output, session) {
   output$test_plot3 <- renderPlot({
     hist(rnorm(100), main = paste("CD", input$coun_dist))
   })
+
 }
 
 shinyApp(ui, server)
