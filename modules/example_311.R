@@ -2,6 +2,10 @@ library(leaflet)
 library(stringr)
 library(purrr)
 
+icon_func <- JS("function(cluster) {
+		return L.divIcon({ html: '<span style=display:inline-block;background:#2F56A6;height:1rem;width:1rem;margin-right:0.5rem;color:#FFFFFF;>' + cluster.getChildCount() + '</span>' });
+	}")
+
 # Create module ui
 example_311_ui <- function(id) {
 
@@ -14,8 +18,8 @@ example_311_ui <- function(id) {
       plotOutput(ns("complaint_type_cd_week"))
     ),
     box(title = "Complaint locations", solidHeader = TRUE,
-      leafletOutput(ns("complaint_map")),
-      uiOutput(ns("map_legend"))
+      leafletOutput(ns("complaint_map"))
+      # uiOutput(ns("map_legend"))
     )
   )
 
@@ -35,7 +39,7 @@ example_311 <- function(input, output, session, coun_dist, week) {
     # Use the local() function to tell dplyr I want to evaluate these
     # not pass them to the database as part of the query
     # then use collect_geo() because I'll be making a map
-    tbl(snapshots_db, "sr_top_10_week_district") %>%
+    tbl(snapshots_db, "sr_ind_top_10_week_district") %>%
       filter(coun_dist == local(coun_dist()),
              week == local(week())) %>%
       collect_geo()
@@ -44,14 +48,17 @@ example_311 <- function(input, output, session, coun_dist, week) {
   # Create bar chart
   output$complaint_type_cd_week <- renderPlot({
     dist_week() %>%
+      count(complaint_type) %>%
       # wrap labels for prettiness
-      mutate(complaint_type = str_wrap(complaint_type, 15)) %>%
-      ggplot(aes(reorder(complaint_type, n), n)) +
-      geom_col() +
+      mutate(complaint_type = str_wrap(complaint_type, 15),
+             complaint_type = reorder(complaint_type, n)) %>%
+      ggplot(aes(complaint_type, n, fill = complaint_type)) +
+      geom_col(show.legend = FALSE) +
       coord_flip() +
       labs(title = "Top complaints",
            x = "Complaint type",
            y = "Number of complaints") +
+      councildown::scale_fill_nycc() +
       councildown::theme_nycc(print = FALSE)
   })
 
@@ -66,7 +73,7 @@ example_311 <- function(input, output, session, coun_dist, week) {
   pal <- reactive({
     req(dist_week)
     pal <- colorFactor(councildown::nycc_pal()(length(unique(dist_week()$complaint_type))),
-                       dist_week()$complaint_type)
+                       reorder(count(dist_week(), complaint_type)$complaint_type, count(dist_week(), complaint_type)$n))
 
   })
 
@@ -79,40 +86,43 @@ example_311 <- function(input, output, session, coun_dist, week) {
 
     bbox <- as.numeric(st_bbox(dist_week()))
 
+
+
     leafletProxy("complaint_map", data = dist_week() %>% st_cast("POINT")) %>%
       clearGroup("complaints") %>%
       addCircleMarkers(radius = 4, stroke = FALSE, fillOpacity = .8,
                        fillColor = ~pal(complaint_type),
-                       popup = ~ complaint_type, group = "complaints") %>%
+                       popup = ~ paste(complaint_type, incident_address, created_date, sep = "<br>"),
+                       group = "complaints") %>%
       clearControls() %>%
       flyToBounds(bbox[1], bbox[2], bbox[3], bbox[4], options = list(duration = .25))
   })
 
   # renderUI creates arbitrary HTML content that will be shown by the
   # corresponding uiOutput
-  output$map_legend <- renderUI({
-    req(pal)
-    req(dist_week)
-
-    pal <- pal()
-
-    # Make paired text color vectors
-    text <- sort(unique(dist_week()$complaint_type))
-    cols <- pal(text)
-
-    # A function to make a square of color with a label next to it
-    make_label <- function(col, text) {
-      paste0(tags$span(style = paste0("display:inline-block;background:", col,";height:1rem;width:1rem;margin-right:0.5rem;")),
-             text)
-    }
-
-    # Make a string of colors and labels
-    out <- paste(map2_chr(cols, text, make_label), collapse = "<br>")
-
-    # Return the string as HTML to be rendered inside <p> tags
-    p(HTML(out))
-
-  })
+  # output$map_legend <- renderUI({
+  #   req(pal)
+  #   req(dist_week)
+  #
+  #   pal <- pal()
+  #
+  #   # Make paired text color vectors
+  #   text <- sort(unique(dist_week()$complaint_type))
+  #   cols <- pal(text)
+  #
+  #   # A function to make a square of color with a label next to it
+  #   make_label <- function(col, text) {
+  #     paste0(tags$span(style = paste0("display:inline-block;background:", col,";height:1rem;width:1rem;margin-right:0.5rem;")),
+  #            text)
+  #   }
+  #
+  #   # Make a string of colors and labels
+  #   out <- paste(map2_chr(cols, text, make_label), collapse = "<br>")
+  #
+  #   # Return the string as HTML to be rendered inside <p> tags
+  #   p(HTML(out))
+  #
+  # })
 
 }
 
