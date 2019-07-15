@@ -32,24 +32,28 @@ sidebar <- dashboardSidebar(
   selectInput("week", "Week", week_labels, selected = current_week),
   sidebarMenu(
     menuItem("311", icon = icon("phone"),
-             menuSubItem("First 311 page", "311_test")),
+             menuSubItem("Opened complaints", "311_opened"),
+             menuSubItem("Closed complaints", "311_closed")),
     menuItem("OEM", icon = icon("warning"),
-             menuSubItem("First OEM page", "oem_test")),
+             menuSubItem("Emergency incidents", "oem_created")),
     menuItem("HPD", icon = icon("home"),
-             menuSubItem("First HPD page", "hpd_test"))
+             menuSubItem("Issued vacate orders", "vacate_issued"),
+             menuSubItem("Rescinded vacate orders", "vacate_rescinded"))
   )
 )
 
 body <- dashboardBody(
   tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "council.css")),
   tabItems(
-    tabItem("311_test",
-            example_311_ui("num_complaints")
+    tabItem("311_opened",
+            opened_311_ui("num_complaints")
             ),
-    tabItem("oem_test",
+    tabItem("311_closed"),
+    tabItem("oem_created",
             plotOutput("test_plot2")),
-    tabItem("hpd_test",
-            plotOutput("test_plot3"))
+    tabItem("vacate_issued",
+            plotOutput("test_plot3")),
+    tabItem("vacate_rescinded")
   )
 )
 
@@ -69,7 +73,7 @@ server <- function(input, output, session) {
   })
 
 
-  callModule(example_311, id = "num_complaints",
+  callModule(opened_311, id = "num_complaints",
              coun_dist = reactive(input$coun_dist),
              week = reactive(input$week))
 }

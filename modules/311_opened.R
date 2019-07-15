@@ -30,7 +30,7 @@ nycc_ggplotly <- function(p, toolbar = FALSE, zoom = FALSE, legend = FALSE, ...)
 }
 
 # Create module ui
-example_311_ui <- function(id) {
+opened_311_ui <- function(id) {
 
   # Namespace for module
   ns <- NS(id)
@@ -51,7 +51,7 @@ example_311_ui <- function(id) {
 
 # Create module server function
 # Needs coun_dist and week global inputs (passed from callModule in main app)
-example_311 <- function(input, output, session, coun_dist, week) {
+opened_311 <- function(input, output, session, coun_dist, week) {
 
   # Get the data for the selected district and week
   dist_week <- reactive({
