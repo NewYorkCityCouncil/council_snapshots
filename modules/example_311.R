@@ -7,7 +7,7 @@ icon_func <- JS("function(cluster) {
 		return L.divIcon({ html: '<span style=display:inline-block;background:#2F56A6;height:1rem;width:1rem;margin-right:0.5rem;color:#FFFFFF;>' + cluster.getChildCount() + '</span>' });
 	}")
 
-nycc_ggplotly <- function(p, toolbar = FALSE, legend = FALSE, ...) {
+nycc_ggplotly <- function(p, toolbar = FALSE, zoom = FALSE, legend = FALSE, ...) {
   stopifnot(inherits(p, "gg"))
 
   if(is.null(p$mapping$text)) warning("Missing `text` aesthetic, tooltips will not be rendered.")
@@ -15,6 +15,12 @@ nycc_ggplotly <- function(p, toolbar = FALSE, legend = FALSE, ...) {
   p <- plotly::ggplotly(p, tooltip = "text", ...) %>%
     config(displayModeBar = toolbar) %>%
     layout(margin = list(l = 80))
+
+  if (!zoom) {
+    p <- p %>%
+      layout(xaxis=list(fixedrange=TRUE)) %>%
+      layout(yaxis=list(fixedrange=TRUE))
+  }
 
   if (!legend) {
     p <- hide_legend(p)
@@ -32,12 +38,12 @@ example_311_ui <- function(id) {
   # Row to hold plots
   fluidRow(
     box(title = "Most common complaints", solidHeader = TRUE,
-      plotlyOutput(ns("complaint_type_cd_week"))
+        plotlyOutput(ns("complaint_type_cd_week"))
     ),
     box(title = "Complaint locations", solidHeader = TRUE,
-      leafletOutput(ns("complaint_map")),
-      actionLink(ns("reset_map"), "Reset map")
-      # uiOutput(ns("map_legend"))
+        leafletOutput(ns("complaint_map")),
+        actionLink(ns("reset_map"), "Reset map")
+        # uiOutput(ns("map_legend"))
     )
   )
 
