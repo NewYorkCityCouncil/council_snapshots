@@ -124,7 +124,7 @@ example_311 <- function(input, output, session, coun_dist, week) {
       flyToBounds(bbox[1], bbox[2], bbox[3], bbox[4], options = list(duration = .25))
   })
 
-  observe({
+  observeEvent(event_data("plotly_click", source = "311 complaint bar"), {
     s <- event_data("plotly_click", source = "311 complaint bar")
     pal <- pal()
 
@@ -144,14 +144,11 @@ example_311 <- function(input, output, session, coun_dist, week) {
         addCircleMarkers(radius = 4, weight = 15, fillOpacity = .8, opacity = 0,
                          fillColor = ~pal(complaint_type),
                          popup = ~ paste(complaint_type, incident_address, created_date, sep = "<br>"),
-                         group = "complaints") %>%
-        clearControls()
-
-    }
+                         group = "complaints")
+      }
   })
 
   observeEvent(input$reset_map, {
-    cat("Reset!")
     req(dist_week)
     pal <- pal()
 
