@@ -116,7 +116,7 @@ example_311 <- function(input, output, session, coun_dist, week) {
 
     leafletProxy("complaint_map", data = dist_week()) %>%
       clearGroup("complaints") %>%
-      addCircleMarkers(radius = 4, stroke = FALSE, fillOpacity = .8,
+      addCircleMarkers(radius = 4, weight = 15, fillOpacity = .8, opacity = 0,
                        fillColor = ~pal(complaint_type),
                        popup = ~ paste(complaint_type, incident_address, created_date, sep = "<br>"),
                        group = "complaints") %>%
@@ -141,7 +141,7 @@ example_311 <- function(input, output, session, coun_dist, week) {
 
       leafletProxy("complaint_map", data = to_map) %>%
         clearGroup("complaints") %>%
-        addCircleMarkers(radius = 4, stroke = FALSE, fillOpacity = .8,
+        addCircleMarkers(radius = 4, weight = 15, fillOpacity = .8, opacity = 0,
                          fillColor = ~pal(complaint_type),
                          popup = ~ paste(complaint_type, incident_address, created_date, sep = "<br>"),
                          group = "complaints") %>%
@@ -159,7 +159,7 @@ example_311 <- function(input, output, session, coun_dist, week) {
 
     leafletProxy("complaint_map", data = dist_week()) %>%
       clearGroup("complaints") %>%
-      addCircleMarkers(radius = 4, stroke = FALSE, fillOpacity = .8,
+      addCircleMarkers(radius = 4, weight = 15, fillOpacity = .8, opacity = 0,
                        fillColor = ~pal(complaint_type),
                        popup = ~ paste(complaint_type, incident_address, created_date, sep = "<br>"),
                        group = "complaints") %>%
