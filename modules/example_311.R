@@ -1,10 +1,27 @@
 library(leaflet)
 library(stringr)
 library(purrr)
+library(plotly)
 
 icon_func <- JS("function(cluster) {
 		return L.divIcon({ html: '<span style=display:inline-block;background:#2F56A6;height:1rem;width:1rem;margin-right:0.5rem;color:#FFFFFF;>' + cluster.getChildCount() + '</span>' });
 	}")
+
+nycc_ggplotly <- function(p, toolbar = FALSE, legend = FALSE, ...) {
+  stopifnot(inherits(p, "gg"))
+
+  if(is.null(p$mapping$text)) warning("Missing `text` aesthetic, tooltips will not be rendered.")
+
+  p <- plotly::ggplotly(p, tooltip = "text", ...) %>%
+    config(displayModeBar = toolbar) %>%
+    layout(margin = list(l = 80))
+
+  if (!legend) {
+    p <- hide_legend(p)
+  }
+
+  p
+}
 
 # Create module ui
 example_311_ui <- function(id) {
@@ -15,10 +32,11 @@ example_311_ui <- function(id) {
   # Row to hold plots
   fluidRow(
     box(title = "Most common complaints", solidHeader = TRUE,
-      plotOutput(ns("complaint_type_cd_week"))
+      plotlyOutput(ns("complaint_type_cd_week"))
     ),
     box(title = "Complaint locations", solidHeader = TRUE,
-      leafletOutput(ns("complaint_map"))
+      leafletOutput(ns("complaint_map")),
+      actionLink(ns("reset_map"), "Reset map")
       # uiOutput(ns("map_legend"))
     )
   )
@@ -46,20 +64,24 @@ example_311 <- function(input, output, session, coun_dist, week) {
   })
 
   # Create bar chart
-  output$complaint_type_cd_week <- renderPlot({
-    dist_week() %>%
+  output$complaint_type_cd_week <- renderPlotly({
+    p <- dist_week() %>%
       count(complaint_type) %>%
       # wrap labels for prettiness
       mutate(complaint_type = str_wrap(complaint_type, 15),
              complaint_type = reorder(complaint_type, n)) %>%
-      ggplot(aes(complaint_type, n, fill = complaint_type)) +
+      ggplot(aes(complaint_type, n, fill = complaint_type,
+                 text = paste(complaint_type, n, sep = "<br>"))) +
       geom_col(show.legend = FALSE) +
       coord_flip() +
       labs(title = "Top complaints",
            x = "Complaint type",
            y = "Number of complaints") +
       councildown::scale_fill_nycc() +
+      scale_x_discrete(labels = function(x) str_replace(x, "(^.*?\\n)(.*?)(\\n.*?$)", "\\1\\2...")) +
       councildown::theme_nycc(print = FALSE)
+
+    nycc_ggplotly(p, source = "311 complaint bar")
   })
 
   # Create starting map that will be updated with leafletProxy()
@@ -86,9 +108,50 @@ example_311 <- function(input, output, session, coun_dist, week) {
 
     bbox <- as.numeric(st_bbox(dist_week()))
 
+    leafletProxy("complaint_map", data = dist_week()) %>%
+      clearGroup("complaints") %>%
+      addCircleMarkers(radius = 4, stroke = FALSE, fillOpacity = .8,
+                       fillColor = ~pal(complaint_type),
+                       popup = ~ paste(complaint_type, incident_address, created_date, sep = "<br>"),
+                       group = "complaints") %>%
+      clearControls() %>%
+      flyToBounds(bbox[1], bbox[2], bbox[3], bbox[4], options = list(duration = .25))
+  })
 
+  observe({
+    s <- event_data("plotly_click", source = "311 complaint bar")
+    pal <- pal()
 
-    leafletProxy("complaint_map", data = dist_week() %>% st_cast("POINT")) %>%
+    if(length(s)) {
+      clicked_level <- dist_week() %>%
+        count(complaint_type) %>%
+        mutate(complaint_type = reorder(complaint_type, n)) %>%
+        pull(complaint_type) %>%
+        levels() %>%
+        .[s[["y"]]]
+
+      to_map <- dist_week() %>%
+        filter(complaint_type == clicked_level)
+
+      leafletProxy("complaint_map", data = to_map) %>%
+        clearGroup("complaints") %>%
+        addCircleMarkers(radius = 4, stroke = FALSE, fillOpacity = .8,
+                         fillColor = ~pal(complaint_type),
+                         popup = ~ paste(complaint_type, incident_address, created_date, sep = "<br>"),
+                         group = "complaints") %>%
+        clearControls()
+
+    }
+  })
+
+  observeEvent(input$reset_map, {
+    cat("Reset!")
+    req(dist_week)
+    pal <- pal()
+
+    bbox <- as.numeric(st_bbox(dist_week()))
+
+    leafletProxy("complaint_map", data = dist_week()) %>%
       clearGroup("complaints") %>%
       addCircleMarkers(radius = 4, stroke = FALSE, fillOpacity = .8,
                        fillColor = ~pal(complaint_type),
