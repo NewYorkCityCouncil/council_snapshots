@@ -35,18 +35,27 @@ opened_311_ui <- function(id) {
   # Namespace for module
   ns <- NS(id)
 
-  # Row to hold plots
-  fluidRow(
-    box(title = "Most common complaints", solidHeader = TRUE,
-        plotlyOutput(ns("complaint_type_cd_week"))
+  fluidPage(
+    # Row to hold plots
+    h3("This week:"),
+    fluidRow(
+      box(title = "Most common complaints", solidHeader = TRUE,
+          plotlyOutput(ns("complaint_type_cd_week"))
+      ),
+      box(title = "Complaint locations", solidHeader = TRUE,
+          leafletOutput(ns("complaint_map")),
+          actionLink(ns("reset_map"), "Reset map")
+          # uiOutput(ns("map_legend"))
+      )
     ),
-    box(title = "Complaint locations", solidHeader = TRUE,
-        leafletOutput(ns("complaint_map")),
-        actionLink(ns("reset_map"), "Reset map")
-        # uiOutput(ns("map_legend"))
+    h3("Year to date:"),
+    fluidRow(
+      box(title = "Most common complaints", solidHeader = TRUE,
+          plotlyOutput(ns("complaint_type_cd_ytd"))),
+      box(title = "Number of complaints", solidHeader = TRUE,
+          plotlyOutput(ns("complaint_num_cd_ytd")))
     )
   )
-
 }
 
 # Create module server function
@@ -145,7 +154,7 @@ opened_311 <- function(input, output, session, coun_dist, week) {
                          fillColor = ~pal(complaint_type),
                          popup = ~ paste(complaint_type, incident_address, created_date, sep = "<br>"),
                          group = "complaints")
-      }
+    }
   })
 
   observeEvent(input$reset_map, {
@@ -190,5 +199,55 @@ opened_311 <- function(input, output, session, coun_dist, week) {
   #
   # })
 
-}
+  dist_ytd <- reactive({
+    req(coun_dist)
 
+    tbl(snapshots_db, "sr_top_10_ytd_district") %>%
+      filter(coun_dist == local(coun_dist())) %>%
+      select(-locations) %>%
+      collect()
+  })
+
+  output$complaint_type_cd_ytd <- renderPlotly({
+    p <- dist_ytd() %>%
+      mutate(complaint_type = str_wrap(complaint_type, 15),
+             complaint_type = reorder(complaint_type, n_tot)) %>%
+      ggplot(aes(complaint_type, n_tot, fill = as.numeric(complaint_type),
+                 text = paste(complaint_type, n_tot, sep = "<br>"))) +
+      geom_col(show.legend = FALSE) +
+      coord_flip() +
+      scale_fill_gradient(low = "#2F56A6", high = "#23417D") +
+      scale_x_discrete(labels = function(x) str_replace(x, "(^.*?\\n)(.*?)(\\n.*?$)", "\\1\\2...")) +
+      labs(title = "Top complaints (YTD)",
+           x = "Complaint type",
+           y = "Number of complaints") +
+      councildown::theme_nycc()
+
+    nycc_ggplotly(p)
+  })
+
+
+  dist_all <- reactive({
+    tbl(snapshots_db, "sr_week_district") %>%
+      filter(coun_dist == local(coun_dist())) %>%
+      select(-locations)
+  })
+
+  output$complaint_num_cd_ytd <- renderPlotly({
+
+    p <- dist_all() %>%
+      group_by(week) %>%
+      summarize(n = sum(n)) %>%
+      collect() %>%
+      ggplot(aes(week, n, text = paste0("Week ", week, ": ", n, " complaints"), group = 1, group = 1)) +
+      geom_point(color = "#23417D") +
+      geom_line() +
+      labs(title = "Service requests per week",
+           x = "Week",
+           y = "Number of service requests") +
+    councildown::theme_nycc()
+
+    nycc_ggplotly(p)
+
+  })
+}
