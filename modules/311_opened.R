@@ -176,7 +176,7 @@ opened_311 <- function(input, output, session, coun_dist, week) {
 
     bbox <- as.numeric(st_bbox(dist_week()))
 
-    leafletProxy("complaint_map", data = dist_week()) %>%
+    leafletProxy("complaint_map", data = map_data()) %>%
       clearGroup("complaints") %>%
       addCircleMarkers(radius = ~4*sqrt(vapply(n, min, FUN.VALUE = numeric(1), 20)), weight = 15, fillOpacity = .8, opacity = 0,
                        fillColor = ~pal(complaint_type),
