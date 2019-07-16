@@ -114,6 +114,17 @@ opened_311 <- function(input, output, session, coun_dist, week) {
 
   })
 
+  map_data <- reactive({
+    req(dist_week)
+
+    dist_week() %>%
+      group_by(lat_lon = paste(st_coordinates(.)[,1], st_coordinates(.)[,2]),
+               complaint_type) %>%
+      summarize(n = n(), created_date = paste(created_date, collapse = "<br>"),
+                incident_address = paste(unique(incident_address), collapse = "<br>"))
+  })
+
+
   # observe(leafletProxy(...)) is the standard design pattern for
   # updating leaflet maps in response to user input
   observe({
@@ -123,11 +134,12 @@ opened_311 <- function(input, output, session, coun_dist, week) {
 
     bbox <- as.numeric(st_bbox(dist_week()))
 
-    leafletProxy("complaint_map", data = dist_week()) %>%
+    leafletProxy("complaint_map", data = map_data()) %>%
       clearGroup("complaints") %>%
-      addCircleMarkers(radius = 4, weight = 15, fillOpacity = .8, opacity = 0,
+      addCircleMarkers(radius = ~4*sqrt(vapply(n, min, FUN.VALUE = numeric(1), 20)), weight = 15, fillOpacity = .8, opacity = 0,
                        fillColor = ~pal(complaint_type),
-                       popup = ~ paste(complaint_type, incident_address, created_date, sep = "<br>"),
+                       popup = ~ paste(complaint_type, n, incident_address, created_date, sep = "<br>"),
+                       popupOptions = popupOptions(maxHeight = 100),
                        group = "complaints") %>%
       clearControls() %>%
       flyToBounds(bbox[1], bbox[2], bbox[3], bbox[4], options = list(duration = .25))
@@ -145,14 +157,15 @@ opened_311 <- function(input, output, session, coun_dist, week) {
         levels() %>%
         .[s[["y"]]]
 
-      to_map <- dist_week() %>%
+      to_map <- map_data() %>%
         filter(complaint_type == clicked_level)
 
       leafletProxy("complaint_map", data = to_map) %>%
         clearGroup("complaints") %>%
-        addCircleMarkers(radius = 4, weight = 15, fillOpacity = .8, opacity = 0,
+        addCircleMarkers(radius = ~4*sqrt(vapply(n, min, FUN.VALUE = numeric(1), 20)), weight = 15, fillOpacity = .8, opacity = 0,
                          fillColor = ~pal(complaint_type),
-                         popup = ~ paste(complaint_type, incident_address, created_date, sep = "<br>"),
+                         popup = ~ paste(complaint_type, n, incident_address, created_date, sep = "<br>"),
+                         popupOptions = popupOptions(maxHeight = 100),
                          group = "complaints")
     }
   })
@@ -165,9 +178,10 @@ opened_311 <- function(input, output, session, coun_dist, week) {
 
     leafletProxy("complaint_map", data = dist_week()) %>%
       clearGroup("complaints") %>%
-      addCircleMarkers(radius = 4, weight = 15, fillOpacity = .8, opacity = 0,
+      addCircleMarkers(radius = ~4*sqrt(vapply(n, min, FUN.VALUE = numeric(1), 20)), weight = 15, fillOpacity = .8, opacity = 0,
                        fillColor = ~pal(complaint_type),
-                       popup = ~ paste(complaint_type, incident_address, created_date, sep = "<br>"),
+                       popup = ~ paste(complaint_type, n, incident_address, created_date, sep = "<br>"),
+                       popupOptions = popupOptions(maxHeight = 100),
                        group = "complaints") %>%
       clearControls() %>%
       flyToBounds(bbox[1], bbox[2], bbox[3], bbox[4], options = list(duration = .25))
