@@ -4,9 +4,9 @@ page_vacate_ui <- function(id) {
   fluidPage(
     fluidRow(
       box(title = "Issued vacate orders",
-          leafletOutput(ns("issued_vacate"))),
+          leafletOutput(ns("issued_vacate")) %>% withSpinner()),
       box(title = "Rescinded vacate orders",
-          leafletOutput(ns("rescinded_vacate")))
+          leafletOutput(ns("rescinded_vacate")) %>% withSpinner())
     )
   )
 }

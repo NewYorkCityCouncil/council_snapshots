@@ -10,10 +10,10 @@ page_oem_ui <- function(id) {
 
     fluidRow(
       box(width = 12, title = "Emergency incident map",
-          leafletOutput(ns("oem_map")))),
+          leafletOutput(ns("oem_map")) %>% withSpinner())),
     fluidRow(
       box(width = 12, title = "Emergency incidents",
-          DT::dataTableOutput(ns("oem_table"))))
+          DT::dataTableOutput(ns("oem_table")) %>% withSpinner()))
   )
 }
 
