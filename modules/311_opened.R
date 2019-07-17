@@ -2,6 +2,7 @@ library(leaflet)
 library(stringr)
 library(purrr)
 library(plotly)
+library(shinycssloaders)
 
 # Create module ui
 opened_311_ui <- function(id, open_calls = TRUE) {
@@ -14,10 +15,10 @@ opened_311_ui <- function(id, open_calls = TRUE) {
     h3("This week:"),
     fluidRow(
       box(title = "Top complaints", solidHeader = TRUE,
-          plotlyOutput(ns("complaint_type_cd_week"), height = "420px")
+          plotlyOutput(ns("complaint_type_cd_week"), height = "420px") %>% withSpinner()
       ),
       box(title = "Complaint locations", solidHeader = TRUE,
-          leafletOutput(ns("complaint_map")),
+          leafletOutput(ns("complaint_map")) %>% withSpinner(),
           actionLink(ns("reset_map"), "Reset map")
           # uiOutput(ns("map_legend"))
       )
@@ -25,9 +26,9 @@ opened_311_ui <- function(id, open_calls = TRUE) {
     h3("Year to date:"),
     fluidRow(
       box(title = "Top complaints", solidHeader = TRUE,
-          plotlyOutput(ns("complaint_type_cd_ytd"))),
+          plotlyOutput(ns("complaint_type_cd_ytd")) %>% withSpinner()),
       box(title = "Number of complaints per week", solidHeader = TRUE,
-          plotlyOutput(ns("complaint_num_cd_ytd")))
+          plotlyOutput(ns("complaint_num_cd_ytd")) %>% withSpinner())
     )
   )
 }
