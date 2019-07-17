@@ -40,8 +40,7 @@ sidebar <- dashboardSidebar(
     menuItem("OEM", icon = icon("warning"),
              menuSubItem("Emergency incidents", "oem_created")),
     menuItem("HPD", icon = icon("home"),
-             menuSubItem("Issued vacate orders", "vacate_issued"),
-             menuSubItem("Rescinded vacate orders", "vacate_rescinded"))
+             menuSubItem("Vacate orders", "vacate_issued"))
   )
 )
 
@@ -56,26 +55,13 @@ body <- dashboardBody(
     tabItem("oem_created",
             page_oem_ui("oem_incident")),
     tabItem("vacate_issued",
-            plotOutput("test_plot3")),
-    tabItem("vacate_rescinded")
+            page_vacate_ui("hpd_vacate"))
   )
 )
 
 ui <- dashboardPage(header, sidebar, body)
 
 server <- function(input, output, session) {
-  output$test_plot1 <- renderPlot({
-    hist(rnorm(100), main = paste("CD", input$coun_dist))
-  })
-
-  output$test_plot2 <- renderPlot({
-    hist(rnorm(100), main = paste("CD", input$coun_dist))
-  })
-
-  output$test_plot3 <- renderPlot({
-    hist(rnorm(100), main = paste("CD", input$coun_dist))
-  })
-
 
   callModule(page_311, id = "num_complaints",
              coun_dist = reactive(input$coun_dist),
@@ -87,6 +73,10 @@ server <- function(input, output, session) {
              open = FALSE)
 
   callModule(page_oem, id = "oem_incident",
+             coun_dist = reactive(input$coun_dist),
+             week = reactive(input$week))
+
+  callModule(page_vacate, id = "hpd_vacate",
              coun_dist = reactive(input$coun_dist),
              week = reactive(input$week))
 }
