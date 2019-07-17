@@ -11,8 +11,11 @@ lapply(modules, source)
 utils <- list.files(path = "util", pattern = "\\.(R|r)$", full.names = TRUE)
 lapply(utils, source)
 
-current_week <- tbl(snapshots_db, "sr_top_10_week_district") %>%
+current_week <- tbl(snapshots_db, "sr_top_10_week_district_closed") %>%
+  group_by(coun_dist) %>%
   summarize(week = max(week)) %>%
+  ungroup() %>%
+  summarize(week = min(week)) %>%
   pull()
 
 weeks <- tibble(week_n = 1:current_week) %>%
@@ -48,7 +51,8 @@ body <- dashboardBody(
     tabItem("311_opened",
             opened_311_ui("num_complaints")
             ),
-    tabItem("311_closed"),
+    tabItem("311_closed",
+            opened_311_ui("num_complaints_closed", open = FALSE)),
     tabItem("oem_created",
             plotOutput("test_plot2")),
     tabItem("vacate_issued",
@@ -76,6 +80,11 @@ server <- function(input, output, session) {
   callModule(opened_311, id = "num_complaints",
              coun_dist = reactive(input$coun_dist),
              week = reactive(input$week))
+
+  callModule(opened_311, id = "num_complaints_closed",
+             coun_dist = reactive(input$coun_dist),
+             week = reactive(input$week),
+             open = FALSE)
 }
 
 shinyApp(ui, server)

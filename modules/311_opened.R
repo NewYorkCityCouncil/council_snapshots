@@ -4,7 +4,7 @@ library(purrr)
 library(plotly)
 
 # Create module ui
-opened_311_ui <- function(id) {
+opened_311_ui <- function(id, open_calls = TRUE) {
 
   # Namespace for module
   ns <- NS(id)
@@ -34,24 +34,42 @@ opened_311_ui <- function(id) {
 
 # Create module server function
 # Needs coun_dist and week global inputs (passed from callModule in main app)
-opened_311 <- function(input, output, session, coun_dist, week) {
+opened_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE) {
 
   # Get the data for the selected district and week
-  dist_week <- reactive({
 
-    # Make sure we have these before trying to use them
-    req(coun_dist)
-    req(week)
+  if (open_calls) {
 
-    # Use the local() function to tell dplyr I want to evaluate these
-    # not pass them to the database as part of the query
-    # then use collect_geo() because I'll be making a map
-    tbl(snapshots_db, "sr_ind_top_10_week_district") %>%
-      filter(coun_dist == local(coun_dist()),
-             week == local(week())) %>%
-      collect_geo()
-  })
+    dist_week <- reactive({
 
+      # Make sure we have these before trying to use them
+      req(coun_dist)
+      req(week)
+
+      # Use the local() function to tell dplyr I want to evaluate these
+      # not pass them to the database as part of the query
+      # then use collect_geo() because I'll be making a map
+      tbl(snapshots_db, "sr_ind_top_10_week_district") %>%
+        filter(coun_dist == local(coun_dist()),
+               week == local(week())) %>%
+        collect_geo()
+    })
+  } else {
+    dist_week <- reactive({
+
+      # Make sure we have these before trying to use them
+      req(coun_dist)
+      req(week)
+
+      # Use the local() function to tell dplyr I want to evaluate these
+      # not pass them to the database as part of the query
+      # then use collect_geo() because I'll be making a map
+      tbl(snapshots_db, "sr_ind_top_10_week_district_closed") %>%
+        filter(coun_dist == local(coun_dist()),
+               week == local(week())) %>%
+        collect_geo()
+    })
+  }
   # Create bar chart
   output$complaint_type_cd_week <- renderPlotly({
     p <- dist_week() %>%
@@ -186,14 +204,27 @@ opened_311 <- function(input, output, session, coun_dist, week) {
   #
   # })
 
-  dist_ytd <- reactive({
-    req(coun_dist)
 
-    tbl(snapshots_db, "sr_top_10_ytd_district") %>%
-      filter(coun_dist == local(coun_dist())) %>%
-      select(-locations) %>%
-      collect()
-  })
+  if (open_calls) {
+    dist_ytd <- reactive({
+      req(coun_dist)
+
+      tbl(snapshots_db, "sr_top_10_ytd_district") %>%
+        filter(coun_dist == local(coun_dist())) %>%
+        select(-locations) %>%
+        collect()
+    })
+
+  } else {
+    dist_ytd <- reactive({
+      req(coun_dist)
+
+      tbl(snapshots_db, "sr_top_10_ytd_district_closed") %>%
+        filter(coun_dist == local(coun_dist())) %>%
+        select(-locations) %>%
+        collect()
+    })
+  }
 
   output$complaint_type_cd_ytd <- renderPlotly({
     p <- dist_ytd() %>%
@@ -213,11 +244,20 @@ opened_311 <- function(input, output, session, coun_dist, week) {
   })
 
 
-  dist_all <- reactive({
-    tbl(snapshots_db, "sr_week_district") %>%
-      filter(coun_dist == local(coun_dist())) %>%
-      select(-locations)
-  })
+  if (open_calls) {
+    dist_all <- reactive({
+      tbl(snapshots_db, "sr_week_district") %>%
+        filter(coun_dist == local(coun_dist())) %>%
+        select(-locations)
+    })
+  } else {
+    dist_all <- reactive({
+      tbl(snapshots_db, "sr_week_district_closed") %>%
+        filter(coun_dist == local(coun_dist())) %>%
+        select(-locations)
+    })
+  }
+
 
   output$complaint_num_cd_ytd <- renderPlotly({
 
@@ -230,9 +270,10 @@ opened_311 <- function(input, output, session, coun_dist, week) {
       geom_line() +
       labs(x = "Week",
            y = "Number of service requests") +
-    councildown::theme_nycc()
+      councildown::theme_nycc()
 
     nycc_ggplotly(p)
 
   })
 }
+
