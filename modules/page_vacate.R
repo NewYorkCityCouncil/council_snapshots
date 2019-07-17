@@ -44,12 +44,13 @@ page_vacate <- function(input, output, session, coun_dist, week) {
 
   observe({
     trigger_issued$depend()
+    leafletProxy("issued_vacate", data = issued_week_dist()) %>%
+      clearGroup("issued")
 
     if (nrow(issued_week_dist()) > 0) {
       bbox <- as.numeric(st_bbox(issued_week_dist()))
 
       leafletProxy("issued_vacate", data = issued_week_dist()) %>%
-        clearGroup("issued") %>%
         addCircleMarkers(radius = 5,
                          fillOpacity = .8, fillColor = "#2F56A6", opacity = 0, weight = 15,
                          group = "issued") %>%
@@ -61,11 +62,13 @@ page_vacate <- function(input, output, session, coun_dist, week) {
   observe({
     trigger_rescinded$depend()
 
+    leafletProxy("rescinded_vacate", data = rescinded_week_dist()) %>%
+      clearGroup("rescinded")
+
     if (nrow(rescinded_week_dist()) > 0) {
       bbox <- as.numeric(st_bbox(rescinded_week_dist()))
 
       leafletProxy("rescinded_vacate", data = rescinded_week_dist()) %>%
-        clearGroup("rescinded") %>%
         addCircleMarkers(radius = 5,
                          fillOpacity = .8, fillColor = "#2F56A6", opacity = 0, weight = 15,
                          group = "rescinded") %>%
