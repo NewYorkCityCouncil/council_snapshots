@@ -5,6 +5,8 @@ library(ggplot2)
 library(dplyr)
 library(lubridate)
 
+options(spinner.color="#2F56A6")
+
 utils <- list.files(path = "util", pattern = "\\.(R|r)$", full.names = TRUE)
 lapply(utils, source)
 
