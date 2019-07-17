@@ -3,32 +3,6 @@ library(stringr)
 library(purrr)
 library(plotly)
 
-icon_func <- JS("function(cluster) {
-		return L.divIcon({ html: '<span style=display:inline-block;background:#2F56A6;height:1rem;width:1rem;margin-right:0.5rem;color:#FFFFFF;>' + cluster.getChildCount() + '</span>' });
-	}")
-
-nycc_ggplotly <- function(p, toolbar = FALSE, zoom = FALSE, legend = FALSE, ...) {
-  stopifnot(inherits(p, "gg"))
-
-  if(is.null(p$mapping$text)) warning("Missing `text` aesthetic, tooltips will not be rendered.")
-
-  p <- plotly::ggplotly(p, tooltip = "text", ...) %>%
-    config(displayModeBar = toolbar) %>%
-    layout(margin = list(l = 80))
-
-  if (!zoom) {
-    p <- p %>%
-      layout(xaxis=list(fixedrange=TRUE)) %>%
-      layout(yaxis=list(fixedrange=TRUE))
-  }
-
-  if (!legend) {
-    p <- hide_legend(p)
-  }
-
-  p
-}
-
 # Create module ui
 opened_311_ui <- function(id) {
 
@@ -39,8 +13,8 @@ opened_311_ui <- function(id) {
     # Row to hold plots
     h3("This week:"),
     fluidRow(
-      box(title = "Most common complaints", solidHeader = TRUE,
-          plotlyOutput(ns("complaint_type_cd_week"))
+      box(title = "Top complaints", solidHeader = TRUE,
+          plotlyOutput(ns("complaint_type_cd_week"), height = "420px")
       ),
       box(title = "Complaint locations", solidHeader = TRUE,
           leafletOutput(ns("complaint_map")),
@@ -50,9 +24,9 @@ opened_311_ui <- function(id) {
     ),
     h3("Year to date:"),
     fluidRow(
-      box(title = "Most common complaints", solidHeader = TRUE,
+      box(title = "Top complaints", solidHeader = TRUE,
           plotlyOutput(ns("complaint_type_cd_ytd"))),
-      box(title = "Number of complaints", solidHeader = TRUE,
+      box(title = "Number of complaints per week", solidHeader = TRUE,
           plotlyOutput(ns("complaint_num_cd_ytd")))
     )
   )
@@ -89,11 +63,10 @@ opened_311 <- function(input, output, session, coun_dist, week) {
                  text = paste(complaint_type, n, sep = "<br>"))) +
       geom_col(show.legend = FALSE) +
       coord_flip() +
-      labs(title = "Top complaints",
-           x = "Complaint type",
+      labs(x = "Complaint type",
            y = "Number of complaints") +
       councildown::scale_fill_nycc() +
-      scale_x_discrete(labels = function(x) str_replace(x, "(^.*?\\n)(.*?)(\\n.*?$)", "\\1\\2...")) +
+      scale_x_discrete(labels = function(x) str_replace(x, "(^.*?\\n)(.*?)(\\n.*?)+$", "\\1\\2...")) +
       councildown::theme_nycc(print = FALSE)
 
     nycc_ggplotly(p, source = "311 complaint bar")
@@ -231,9 +204,8 @@ opened_311 <- function(input, output, session, coun_dist, week) {
       geom_col(show.legend = FALSE) +
       coord_flip() +
       scale_fill_gradient(low = "#2F56A6", high = "#23417D") +
-      scale_x_discrete(labels = function(x) str_replace(x, "(^.*?\\n)(.*?)(\\n.*?$)", "\\1\\2...")) +
-      labs(title = "Top complaints (YTD)",
-           x = "Complaint type",
+      scale_x_discrete(labels = function(x) str_replace(x, "(^.*?\\n)(.*?)(\\n.*?)+$", "\\1\\2...")) +
+      labs(x = "Complaint type",
            y = "Number of complaints") +
       councildown::theme_nycc()
 
@@ -256,8 +228,7 @@ opened_311 <- function(input, output, session, coun_dist, week) {
       ggplot(aes(week, n, text = paste0("Week ", week, ": ", n, " complaints"), group = 1, group = 1)) +
       geom_point(color = "#23417D") +
       geom_line() +
-      labs(title = "Service requests per week",
-           x = "Week",
+      labs(x = "Week",
            y = "Number of service requests") +
     councildown::theme_nycc()
 

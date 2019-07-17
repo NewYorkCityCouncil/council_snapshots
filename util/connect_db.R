@@ -23,15 +23,27 @@ pw <- Sys.getenv("SNAPSHOTS_DB_PW")
 
 # Create a pool of database connections. This way the app can send concurrent
 # queries when multiple users are requesting data
-snapshots_db <- dbPool(
-  drv = RPostgreSQL::PostgreSQL(),
-  dbname = "snapshots",
-  host = host,
-  user = user,
-  password = pw
-)
 
-# Make sure we close database connections when the app exits
-onStop(function() {
-  poolClose(snapshots_db)
-})
+if (!interactive()) {
+
+  snapshots_db <- dbPool(
+    drv = RPostgreSQL::PostgreSQL(),
+    dbname = "snapshots",
+    host = host,
+    user = user,
+    password = pw
+  )
+
+  # Make sure we close database connections when the app exits
+  onStop(function() {
+    poolClose(snapshots_db)
+  })
+} else {
+  snapshots_db <- DBI::dbConnect(
+    drv = RPostgreSQL::PostgreSQL(),
+    dbname = "snapshots",
+    host = host,
+    user = user,
+    password = pw
+  )
+}
