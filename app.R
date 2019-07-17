@@ -49,10 +49,10 @@ body <- dashboardBody(
   tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "council.css")),
   tabItems(
     tabItem("311_opened",
-            opened_311_ui("num_complaints")
+            page_311_ui("num_complaints")
             ),
     tabItem("311_closed",
-            opened_311_ui("num_complaints_closed", open = FALSE)),
+            page_311_ui("num_complaints_closed", open = FALSE)),
     tabItem("oem_created",
             plotOutput("test_plot2")),
     tabItem("vacate_issued",
@@ -77,11 +77,11 @@ server <- function(input, output, session) {
   })
 
 
-  callModule(opened_311, id = "num_complaints",
+  callModule(page_311, id = "num_complaints",
              coun_dist = reactive(input$coun_dist),
              week = reactive(input$week))
 
-  callModule(opened_311, id = "num_complaints_closed",
+  callModule(page_311, id = "num_complaints_closed",
              coun_dist = reactive(input$coun_dist),
              week = reactive(input$week),
              open = FALSE)
