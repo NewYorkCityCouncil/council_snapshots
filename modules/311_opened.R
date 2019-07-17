@@ -37,6 +37,21 @@ opened_311_ui <- function(id, open_calls = TRUE) {
 # Needs coun_dist and week global inputs (passed from callModule in main app)
 opened_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE) {
 
+
+  makeReactiveTrigger <- function() {
+    rv <- reactiveValues(a = 0)
+    list(
+      depend = function() {
+        rv$a
+        invisible()
+      },
+      trigger = function() {
+        rv$a <- isolate(rv$a + 1)
+      }
+    )
+  }
+  myTrigger <- makeReactiveTrigger()
+
   # Get the data for the selected district and week
 
   if (open_calls) {
@@ -93,6 +108,7 @@ opened_311 <- function(input, output, session, coun_dist, week, open_calls = TRU
 
   # Create starting map that will be updated with leafletProxy()
   output$complaint_map <- renderLeaflet({
+    myTrigger$trigger()
     leaflet() %>%
       councildown::addCouncilStyle()
   })
@@ -121,6 +137,7 @@ opened_311 <- function(input, output, session, coun_dist, week, open_calls = TRU
   # updating leaflet maps in response to user input
   observe({
 
+    myTrigger$depend()
     req(dist_week)
     pal <- pal()
 
