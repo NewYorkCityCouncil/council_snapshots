@@ -5,7 +5,7 @@ library(plotly)
 library(shinycssloaders)
 
 # Create module ui
-opened_311_ui <- function(id, open_calls = TRUE) {
+page_311_ui <- function(id, open_calls = TRUE) {
 
   # Namespace for module
   ns <- NS(id)
@@ -35,21 +35,8 @@ opened_311_ui <- function(id, open_calls = TRUE) {
 
 # Create module server function
 # Needs coun_dist and week global inputs (passed from callModule in main app)
-opened_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE) {
+page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE) {
 
-
-  makeReactiveTrigger <- function() {
-    rv <- reactiveValues(a = 0)
-    list(
-      depend = function() {
-        rv$a
-        invisible()
-      },
-      trigger = function() {
-        rv$a <- isolate(rv$a + 1)
-      }
-    )
-  }
   myTrigger <- makeReactiveTrigger()
 
   # Get the data for the selected district and week

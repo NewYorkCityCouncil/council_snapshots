@@ -5,11 +5,11 @@ library(ggplot2)
 library(dplyr)
 library(lubridate)
 
-modules <- list.files(path = "modules", pattern = "\\.(R|r)$", full.names = TRUE)
-lapply(modules, source)
-
 utils <- list.files(path = "util", pattern = "\\.(R|r)$", full.names = TRUE)
 lapply(utils, source)
+
+modules <- list.files(path = "modules", pattern = "\\.(R|r)$", full.names = TRUE)
+lapply(modules, source)
 
 current_week <- tbl(snapshots_db, "sr_top_10_week_district_closed") %>%
   group_by(coun_dist) %>%
@@ -54,7 +54,7 @@ body <- dashboardBody(
     tabItem("311_closed",
             page_311_ui("num_complaints_closed", open = FALSE)),
     tabItem("oem_created",
-            plotOutput("test_plot2")),
+            page_oem_ui("oem_incident")),
     tabItem("vacate_issued",
             plotOutput("test_plot3")),
     tabItem("vacate_rescinded")
@@ -85,6 +85,10 @@ server <- function(input, output, session) {
              coun_dist = reactive(input$coun_dist),
              week = reactive(input$week),
              open = FALSE)
+
+  callModule(page_oem, id = "oem_incident",
+             coun_dist = reactive(input$coun_dist),
+             week = reactive(input$week))
 }
 
 shinyApp(ui, server)
