@@ -6,7 +6,8 @@
   background-image: url("nycc-wordmark-blue.png");
   background-position: center; /* Center the image */
   background-repeat: no-repeat; /* Do not repeat the image */
-  background-size: 90%;
+  background-size: 75%;
+  background-color: #fff !important;
 }
 
 body {
