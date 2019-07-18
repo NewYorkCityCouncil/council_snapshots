@@ -30,7 +30,7 @@ weeks <- tibble(week_n = 1:current_week) %>%
 week_labels <- weeks %>% pull(week_n)
 names(week_labels) <- weeks %>% pull(label)
 
-header <- dashboardHeader(title = "Council Snapshots")
+header <- dashboardHeader(title = "")
 
 sidebar <- dashboardSidebar(
   selectInput("coun_dist", "Council district", 1:51, selected = 1),
@@ -61,7 +61,7 @@ body <- dashboardBody(
   )
 )
 
-ui <- dashboardPage(header, sidebar, body)
+ui <- dashboardPage(header, sidebar, body, skin = "black")
 
 server <- function(input, output, session) {
 

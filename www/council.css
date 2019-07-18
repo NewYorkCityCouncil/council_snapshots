@@ -2,6 +2,11 @@
 
 .main-header .logo {
   font-family: "Georgia", serif;
+  color: #2F56A6 !important;
+  background-image: url("nycc-wordmark-blue.png");
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+  background-size: 90%;
 }
 
 body {
