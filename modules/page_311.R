@@ -78,8 +78,9 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE)
     p <- dist_week() %>%
       count(complaint_type) %>%
       # wrap labels for prettiness
-      mutate(complaint_type = str_wrap(complaint_type, 15),
-             complaint_type = reorder(complaint_type, n)) %>%
+      mutate(complaint_type = tools::toTitleCase(tolower(complaint_type)) %>%
+               str_wrap(15) %>%
+               reorder(n)) %>%
       ggplot(aes(complaint_type, n, fill = complaint_type,
                  text = paste(complaint_type, n, sep = "<br>"))) +
       geom_col(show.legend = FALSE) +
@@ -233,8 +234,9 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE)
 
   output$complaint_type_cd_ytd <- renderPlotly({
     p <- dist_ytd() %>%
-      mutate(complaint_type = str_wrap(complaint_type, 15),
-             complaint_type = reorder(complaint_type, n_tot)) %>%
+      mutate(complaint_type = tools::toTitleCase(tolower(complaint_type)) %>%
+               str_wrap(15) %>%
+               reorder(n_tot)) %>%
       ggplot(aes(complaint_type, n_tot, fill = as.numeric(complaint_type),
                  text = paste(complaint_type, n_tot, sep = "<br>"))) +
       geom_col(show.legend = FALSE) +
@@ -270,7 +272,9 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE)
       group_by(week) %>%
       summarize(n = sum(n)) %>%
       collect() %>%
-      ggplot(aes(week, n, text = paste0("Week ", week, ": ", n, " complaints"), group = 1, group = 1)) +
+      mutate(date = floor_date(ymd("2019-01-01")+(7*(week-1)), unit = "week")) %>%
+      ggplot(aes(date, n,
+                 text = paste0("Week of ", format(date, format = "%b %e"), ": ", n, " complaints"), group = 1, group = 1)) +
       geom_point(color = "#23417D") +
       geom_line() +
       labs(x = "Week",
