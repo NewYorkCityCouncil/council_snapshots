@@ -17,6 +17,23 @@ page_oem_ui <- function(id) {
   )
 }
 
+Fmt <- function(x) UseMethod("Fmt")
+Fmt.difftime <- function(x) {
+  units(x) <- "secs"
+  x <- unclass(x)
+  NextMethod()
+}
+Fmt.default <- function(x) {
+  y <- abs(x)
+
+  # if(is.na(y)){ return("Ongoing as of last update")}
+
+  sprintf("%02d hours %02d minutes",
+          y %/% 3600,  # hours
+          y %% 3600 %/% 60) # minutes
+}
+
+
 page_oem <- function(input, output, session, week, coun_dist) {
 
 
@@ -27,7 +44,9 @@ page_oem <- function(input, output, session, week, coun_dist) {
       filter(date_part("week", creation_date) == local(week())) %>%
       collect_geo() %>%
       st_join(dists) %>%
-      filter(coun_dist == coun_dist())
+      filter(coun_dist == coun_dist()) %>%
+      mutate(duration = closed_date - creation_date,
+             duration_pretty = ifelse(is.na(duration), "Ongoing as of last update", Fmt(duration)))
   })
 
   output$oem_map <- renderLeaflet({
@@ -43,8 +62,9 @@ page_oem <- function(input, output, session, week, coun_dist) {
 
     leafletProxy("oem_map", data = oem_week_dist()) %>%
       clearGroup("oem_incidents") %>%
-      addCircleMarkers(radius = 5, popup = ~incident_type,
-                       fillOpacity = .8, fillColor = "#2F56A6", opacity = 0, weight = 15,
+      addCircleMarkers(radius = ~ifelse(is.na(duration), 5, 25*sqrt(as.double(duration)/max(as.double(duration)))),
+                       popup = ~paste(incident_type, location, paste(creation_date, closed_date, sep = " - "), duration_pretty, sep = "<br>"),
+                       fillOpacity = .8, fillColor = ~ifelse(is.na(closed_date), "#D05D4E","#2F56A6"), opacity = 0, weight = 15,
                        group = "oem_incidents") %>%
       clearControls() %>%
       flyToBounds(bbox[1], bbox[2], bbox[3], bbox[4], options = list(duration = .25))
