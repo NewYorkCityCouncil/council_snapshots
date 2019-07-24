@@ -67,12 +67,14 @@ server <- function(input, output, session) {
 
   callModule(page_311, id = "num_complaints",
              coun_dist = reactive(input$coun_dist),
-             week = reactive(input$week))
+             week = reactive(input$week),
+             current_week = current_week)
 
   callModule(page_311, id = "num_complaints_closed",
              coun_dist = reactive(input$coun_dist),
              week = reactive(input$week),
-             open = FALSE)
+             open = FALSE,
+             current_week = current_week)
 
   callModule(page_oem, id = "oem_incident",
              coun_dist = reactive(input$coun_dist),

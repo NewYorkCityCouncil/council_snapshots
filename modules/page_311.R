@@ -35,7 +35,7 @@ page_311_ui <- function(id, open_calls = TRUE) {
 
 # Create module server function
 # Needs coun_dist and week global inputs (passed from callModule in main app)
-page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE) {
+page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE, current_week) {
 
   myTrigger <- makeReactiveTrigger()
 
@@ -269,14 +269,15 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE)
   output$complaint_num_cd_ytd <- renderPlotly({
 
     p <- dist_all() %>%
+      filter(week <= local(current_week)) %>%
       group_by(week) %>%
       summarize(n = sum(n)) %>%
       collect() %>%
-      mutate(date = floor_date(ymd("2019-01-01")+(7*(week-1)), unit = "week")) %>%
+      mutate(date = floor_date(ymd("2019-01-01")+(7*(week-1)), unit = "week") + 1) %>%
       ggplot(aes(date, n,
                  text = paste0("Week of ", format(date, format = "%b %e"), ": ", n, " complaints"), group = 1, group = 1)) +
       geom_point(color = "#23417D") +
-      geom_line() +
+      geom_line(color = "#23417D") +
       labs(x = "Week",
            y = "Number of service requests") +
       councildown::theme_nycc()
