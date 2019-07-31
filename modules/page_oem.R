@@ -50,13 +50,14 @@ page_oem <- function(input, output, session, week, coun_dist) {
   })
 
   output$oem_map <- renderLeaflet({
-    trigger$trigger()
+    # trigger$trigger()
+    map_updater$resume()
     leaflet() %>%
       councildown::addCouncilStyle()
   })
 
-  observe({
-    trigger$depend()
+  map_updater <- observe(suspended = TRUE, {
+    # trigger$depend()
     bbox <- as.numeric(st_bbox(oem_week_dist()))
 
 

@@ -96,7 +96,8 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
 
   # Create starting map that will be updated with leafletProxy()
   output$complaint_map <- renderLeaflet({
-    myTrigger$trigger()
+    # myTrigger$trigger()
+    map_updater$resume()
     leaflet() %>%
       councildown::addCouncilStyle()
   })
@@ -123,9 +124,9 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
 
   # observe(leafletProxy(...)) is the standard design pattern for
   # updating leaflet maps in response to user input
-  observe({
+  map_updater <- observe(suspended = TRUE, {
 
-    myTrigger$depend()
+    # myTrigger$depend()
     req(dist_week)
     pal <- pal()
 

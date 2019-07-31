@@ -41,19 +41,21 @@ page_vacate <- function(input, output, session, coun_dist, week) {
   })
 
   output$issued_vacate <- renderLeaflet({
-    trigger_issued$trigger()
+    # trigger_issued$trigger()
+    map_updater_issued$resume()
     leaflet() %>%
       councildown::addCouncilStyle()
   })
 
   output$rescinded_vacate <- renderLeaflet({
-    trigger_rescinded$trigger()
+    # trigger_rescinded$trigger()
+    map_updater_rescinded$resume()
     leaflet() %>%
       councildown::addCouncilStyle()
   })
 
-  observe({
-    trigger_issued$depend()
+  map_updater_issued <- observe(suspended = TRUE, {
+    # trigger_issued$depend()
     leafletProxy("issued_vacate", data = issued_week_dist()) %>%
       clearGroup("issued")
 
@@ -70,8 +72,8 @@ page_vacate <- function(input, output, session, coun_dist, week) {
     }
   })
 
-  observe({
-    trigger_rescinded$depend()
+  map_updater_rescinded <- observe(suspended = TRUE, {
+    # trigger_rescinded$depend()
 
     leafletProxy("rescinded_vacate", data = rescinded_week_dist()) %>%
       clearGroup("rescinded")
