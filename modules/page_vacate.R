@@ -52,7 +52,7 @@ page_vacate <- function(input, output, session, coun_dist, week) {
       councildown::addCouncilStyle()
   })
 
-  observe(suspended = TRUE, {
+  observe({
     trigger_issued$depend()
     leafletProxy("issued_vacate", data = issued_week_dist()) %>%
       clearGroup("issued")
@@ -70,7 +70,7 @@ page_vacate <- function(input, output, session, coun_dist, week) {
     }
   })
 
-  observe(suspended = TRUE, {
+  observe({
     trigger_rescinded$depend()
 
     leafletProxy("rescinded_vacate", data = rescinded_week_dist()) %>%

@@ -55,7 +55,7 @@ page_oem <- function(input, output, session, week, coun_dist) {
       councildown::addCouncilStyle()
   })
 
-  observe(suspended = TRUE, {
+  observe({
     trigger$depend()
     bbox <- as.numeric(st_bbox(oem_week_dist()))
 
