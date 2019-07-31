@@ -106,8 +106,10 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
   # places (e.g. to create the legend)
   pal <- reactive({
     req(dist_week)
-    pal <- colorFactor(councildown::nycc_pal()(length(unique(dist_week()$complaint_type))),
-                       reorder(count(dist_week(), complaint_type)$complaint_type, count(dist_week(), complaint_type)$n))
+    dat <- dist_week() %>%
+      as.data.frame()
+    pal <- colorFactor(councildown::nycc_pal()(length(unique(dat$complaint_type))),
+                       reorder(count(dat, complaint_type)$complaint_type, count(dat, complaint_type)$n))
 
   })
 
@@ -115,10 +117,12 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
     req(dist_week)
 
     dist_week() %>%
-      group_by(lat_lon = paste(st_coordinates(.)[,1], st_coordinates(.)[,2]),
-               complaint_type) %>%
-      summarize(n = n(), created_date = paste(created_date, collapse = "<br>"),
-                incident_address = paste(unique(incident_address), collapse = "<br>"))
+      mutate(lon = st_coordinates(.)[,1], lat = st_coordinates(.)[,2]) %>%
+      as.data.frame() %>%
+      group_by(lon, lat, complaint_type) %>%
+      summarize(n = n(), created_date = paste0(created_date, collapse = "<br>"),
+                incident_address = paste0(unique(incident_address), collapse = "<br>")) %>%
+      st_as_sf(coords = c("lon", "lat"), crs = st_crs(dist_week()))
   })
 
 
