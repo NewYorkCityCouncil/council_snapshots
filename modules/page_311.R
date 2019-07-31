@@ -123,7 +123,7 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
 
   # observe(leafletProxy(...)) is the standard design pattern for
   # updating leaflet maps in response to user input
-  observe({
+  observe(suspended = TRUE, {
 
     myTrigger$depend()
     req(dist_week)
