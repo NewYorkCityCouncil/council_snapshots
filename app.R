@@ -13,6 +13,7 @@ lapply(utils, source)
 modules <- list.files(path = "modules", pattern = "\\.(R|r)$", full.names = TRUE)
 lapply(modules, source)
 
+
 current_week <- tbl(snapshots_db, "sr_top_10_week_district_closed") %>%
   group_by(coun_dist) %>%
   summarize(week = max(week)) %>%
@@ -30,38 +31,46 @@ weeks <- tibble(week_n = 1:current_week) %>%
 week_labels <- weeks %>% pull(week_n)
 names(week_labels) <- weeks %>% pull(label)
 
-header <- dashboardHeader(title = "")
+ui <- function(request) {
 
-sidebar <- dashboardSidebar(
-  selectInput("coun_dist", "Council district", 1:51, selected = 1),
-  selectInput("week", "Week", week_labels, selected = current_week),
-  sidebarMenu(
-    menuItem("311", icon = icon("phone"),
-             menuSubItem("Opened complaints", "311_opened"),
-             menuSubItem("Closed complaints", "311_closed")),
-    menuItem("OEM", icon = icon("warning"),
-             menuSubItem("Emergency incidents", "oem_created")),
-    menuItem("HPD", icon = icon("home"),
-             menuSubItem("Vacate orders", "vacate_issued"))
+  header <- dashboardHeader(title = "",
+                            tags$li(
+                              class = "dropdown", style = "transform: translate(-5px, 25%);",
+                              bookmarkButton(label = "Share view", icon = icon("share"))
+                            )
   )
-)
 
-body <- dashboardBody(
-  tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "council.css")),
-  tabItems(
-    tabItem("311_opened",
-            page_311_ui("num_complaints")
-            ),
-    tabItem("311_closed",
-            page_311_ui("num_complaints_closed", open = FALSE)),
-    tabItem("oem_created",
-            page_oem_ui("oem_incident")),
-    tabItem("vacate_issued",
-            page_vacate_ui("hpd_vacate"))
+  sidebar <- dashboardSidebar(
+    selectInput("coun_dist", "Council district", 1:51, selected = 1),
+    selectInput("week", "Week", week_labels, selected = current_week),
+    sidebarMenu(id = "tabs",
+                menuItem("311", icon = icon("phone"),
+                         menuSubItem("Opened complaints", "311_opened"),
+                         menuSubItem("Closed complaints", "311_closed")),
+                menuItem("OEM", icon = icon("warning"),
+                         menuSubItem("Emergency incidents", "oem_created")),
+                menuItem("HPD", icon = icon("home"),
+                         menuSubItem("Vacate orders", "vacate_issued"))
+    )
   )
-)
 
-ui <- dashboardPage(header, sidebar, body, skin = "black")
+  body <- dashboardBody(
+    tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "council.css")),
+    tabItems(
+      tabItem("311_opened",
+              page_311_ui("num_complaints")
+      ),
+      tabItem("311_closed",
+              page_311_ui("num_complaints_closed", open = FALSE)),
+      tabItem("oem_created",
+              page_oem_ui("oem_incident")),
+      tabItem("vacate_issued",
+              page_vacate_ui("hpd_vacate"))
+    )
+  )
+
+  dashboardPage(header, sidebar, body, skin = "black")
+}
 
 server <- function(input, output, session) {
 
@@ -83,6 +92,7 @@ server <- function(input, output, session) {
   callModule(page_vacate, id = "hpd_vacate",
              coun_dist = reactive(input$coun_dist),
              week = reactive(input$week))
+
 }
 
-shinyApp(ui, server)
+shinyApp(ui, server, enableBookmarking = "url")

@@ -91,7 +91,8 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
       scale_x_discrete(labels = function(x) str_replace(x, "(^.*?\\n)(.*?)(\\n.*?)+$", "\\1\\2...")) +
       councildown::theme_nycc(print = FALSE)
 
-    nycc_ggplotly(p, source = "311 complaint bar")
+    nycc_ggplotly(p, source = "311 complaint bar") %>%
+      event_register('plotly_click')
   })
 
   # Create starting map that will be updated with leafletProxy()
@@ -145,8 +146,15 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
                        group = "complaints") %>%
       clearControls() %>%
       flyToBounds(bbox[1], bbox[2], bbox[3], bbox[4], options = list(duration = .25))
+
+    # print(input$complaint_map_bounds)
   })
 
+  selected_complaint_plotly <- reactive({
+    event_data("plotly_click", source = "311 complaint bar")
+  })
+
+  last_click <- NULL
   observeEvent(event_data("plotly_click", source = "311 complaint bar"), {
     s <- event_data("plotly_click", source = "311 complaint bar")
     pal <- pal()
@@ -170,6 +178,8 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
                          popupOptions = popupOptions(maxHeight = 100),
                          group = "complaints")
     }
+
+    last_click <<- s
   })
 
   observeEvent(input$reset_map, {
@@ -187,6 +197,7 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
                        group = "complaints") %>%
       clearControls() %>%
       flyToBounds(bbox[1], bbox[2], bbox[3], bbox[4], options = list(duration = .25))
+    last_click <<- NULL
   })
 
   # renderUI creates arbitrary HTML content that will be shown by the
@@ -290,5 +301,46 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
     nycc_ggplotly(p)
 
   })
+
+
+  onBookmark({
+    function(state) {
+      state$values$map_bounds <- input$complaint_map_bounds
+      state$values$plotly_clicked <- last_click
+      state$values$session_ns <- session$ns
+    }
+  })
+
+  onRestored(function(state) {
+
+    s <- state$values$plotly_clicked
+    pal <- pal()
+
+    if(length(s)) {
+      clicked_level <- dist_week() %>%
+        count(complaint_type) %>%
+        mutate(complaint_type = reorder(complaint_type, n)) %>%
+        pull(complaint_type) %>%
+        levels() %>%
+        .[s[["y"]]]
+
+      to_map <- map_data() %>%
+        filter(complaint_type == clicked_level)
+
+      leafletProxy("complaint_map", data = to_map) %>%
+        clearGroup("complaints") %>%
+        addCircleMarkers(radius = ~4*sqrt(vapply(n, min, FUN.VALUE = numeric(1), 20)), weight = 15, fillOpacity = .8, opacity = 0,
+                         fillColor = ~pal(complaint_type),
+                         popup = ~ paste(complaint_type, n, incident_address, created_date, sep = "<br>"),
+                         popupOptions = popupOptions(maxHeight = 100),
+                         group = "complaints")
+    }
+
+    bounds <- state$values$complaint_map_bounds
+    leafletProxy(session$ns("complaint_map")) %>%
+      flyToBounds(bounds$west, bounds$south, bounds$east, bounds$north)
+  })
+
 }
+
 
