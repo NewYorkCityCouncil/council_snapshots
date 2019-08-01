@@ -47,7 +47,9 @@ sidebar <- dashboardSidebar(
 )
 
 body <- dashboardBody(
-  tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "council.css")),
+  tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "council.css"),
+  '<script async src="https://www.googletagmanager.com/gtag/js?id=UA-111461633-2"></script>',
+  includeScript("analytics.js")),
   tabItems(
     tabItem("311_opened",
             page_311_ui("num_complaints")
