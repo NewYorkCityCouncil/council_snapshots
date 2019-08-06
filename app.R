@@ -110,9 +110,20 @@ server <- function(input, output, session) {
       # Knit the document, passing in the `params` list, and eval it in a
       # child of the global environment (this isolates the code in the document
       # from the code in this app).
-      rmarkdown::render(file.path(tmp_dir, "pdf_report", "pdf_report.Rmd"), output_file = file,
+      # showModal(modalDialog(
+      #   title = "Generating report",
+      #   "Crunching the freshest data just for you! This might take a minute."
+      # ))
+
+      withProgress({
+        rmarkdown::render(file.path(tmp_dir, "pdf_report", "pdf_report.Rmd"), output_file = file,
                         params = params, envir = new.env()
-      )
+        )},
+        value = 0,
+        message = "Generating report",
+        detail = "Crunching the freshest data just for you!")
+
+
     }
   )
 }
