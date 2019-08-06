@@ -420,5 +420,5 @@ if (nrow(rescinded_week_dist) > 0) {
 `r if (nrow(rescinded_week_dist) == 0) {"No rescinded vacate orders."}`
 
 ```{r}
-setProgress(1)
+setProgress(.9)
 ```

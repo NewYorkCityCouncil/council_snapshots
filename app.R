@@ -119,7 +119,7 @@ server <- function(input, output, session) {
         rmarkdown::render(file.path(tmp_dir, "pdf_report", "pdf_report.Rmd"), output_file = file,
                         params = params, envir = new.env()
         )},
-        value = 0,
+        value = .1,
         message = "Generating report",
         detail = "Crunching the freshest data just for you!")
 
