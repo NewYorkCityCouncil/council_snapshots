@@ -1,0 +1,402 @@
+---
+title: "Council district `r params$coun_dist`: `r params$week`"
+author: "Data Operations Unit"
+date: '`r councildown::pretty_date()`'
+output: 
+  councildown::council_pdf:
+    latex_engine: xelatex
+  councildown::council_html: default
+compact-title: true
+fontsize: 11pt
+subparagraph: yes
+params:
+  week: NA
+  coun_dist: NA
+header-includes:
+  - \usepackage{lscape}
+---
+
+
+```{r include = FALSE}
+library(ggplot2)
+library(councildown)
+
+extrafont::loadfonts()
+knitr::knit_hooks$set(embed = hook_pdfembed)
+knitr::opts_chunk$set(echo = FALSE, embed = TRUE, warning = FALSE, message = FALSE)
+knitr::opts_knit$set(root.dir = here::here())
+```
+
+```{r}
+week <- params$week
+coun_dist <- params$coun_dist
+```
+
+```{r results = "hide"}
+library(shiny)
+library(shinydashboard)
+library(tibble)
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+library(stringr)
+library(leaflet)
+library(stringr)
+library(purrr)
+
+utils <- list.files(path = "util", pattern = "\\.(R|r)$", full.names = TRUE)
+lapply(utils, source)
+
+current_week <- tbl(snapshots_db, "sr_top_10_week_district_closed") %>%
+  group_by(coun_dist) %>%
+  summarize(week = max(week)) %>%
+  ungroup() %>%
+  summarize(week = min(week)) %>%
+  pull()
+
+dists <- tbl(snapshots_db, "council_districts") %>%
+  collect_geo()
+
+Fmt <- function(x) UseMethod("Fmt")
+Fmt.difftime <- function(x) {
+  units(x) <- "secs"
+  x <- unclass(x)
+  NextMethod()
+}
+Fmt.default <- function(x) {
+  y <- abs(x)
+  
+  # if(is.na(y)){ return("Ongoing as of last update")}
+  
+  sprintf("%02d hours %02d minutes",
+          y %/% 3600,  # hours
+          y %% 3600 %/% 60) # minutes
+}
+
+```
+
+# 311 complaints
+
+## Opened Complaints
+
+```{r}
+dist_week <- tbl(snapshots_db, "sr_ind_top_10_week_district") %>%
+  filter(coun_dist == local(coun_dist),
+         week == local(week)) %>%
+  collect_geo()
+```
+
+```{r}
+dist_week %>%
+  count(complaint_type) %>%
+  # wrap labels for prettiness
+  mutate(complaint_type = tools::toTitleCase(tolower(complaint_type)) %>%
+           str_wrap(15) %>%
+           reorder(n)) %>%
+  ggplot(aes(complaint_type, n, fill = complaint_type,
+             text = paste(complaint_type, n, sep = "<br>"))) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  labs(x = "Complaint type",
+       y = "Number of complaints") +
+  councildown::scale_fill_nycc() +
+  scale_x_discrete(labels = function(x) str_replace(x, "(^.*?\\n)(.*?)(\\n.*?)+$", "\\1\\2...")) +
+  councildown::theme_nycc(print = FALSE)
+```
+
+```{r}
+dat <- dist_week %>%
+  as.data.frame()
+pal <- colorFactor(councildown::nycc_pal()(length(unique(dat$complaint_type))),
+                   reorder(count(dat, complaint_type)$complaint_type, count(dat, complaint_type)$n))
+```
+
+```{r}
+map_data <- dist_week %>%
+  mutate(lon = st_coordinates(.)[,1], lat = st_coordinates(.)[,2]) %>%
+  as.data.frame() %>%
+  group_by(lon, lat, complaint_type) %>%
+  summarize(n = n(), created_date = paste0(created_date, collapse = "<br>"),
+            incident_address = paste0(unique(incident_address), collapse = "<br>")) %>%
+  st_as_sf(coords = c("lon", "lat"), crs = st_crs(dist_week))
+```
+
+```{r}
+bbox <- as.numeric(st_bbox(map_data))
+
+leaflet(map_data) %>%
+  councildown::addCouncilStyle() %>%
+  clearGroup("complaints") %>%
+  addCircleMarkers(radius = 4, weight = 15, fillOpacity = .8, opacity = 0,
+                   fillColor = ~pal(complaint_type)) %>% 
+  fitBounds(bbox[1], bbox[2], bbox[3], bbox[4])
+```
+
+
+```{r}
+dist_ytd <- tbl(snapshots_db, "sr_top_10_ytd_district") %>%
+  filter(coun_dist == local(coun_dist)) %>%
+  select(-locations) %>%
+  collect()
+```
+
+```{r}
+dist_ytd %>%
+  mutate(complaint_type = tools::toTitleCase(tolower(complaint_type)) %>%
+           str_wrap(15) %>%
+           reorder(n_tot)) %>%
+  ggplot(aes(complaint_type, n_tot, fill = as.numeric(complaint_type),
+             text = paste(complaint_type, n_tot, sep = "<br>"))) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  scale_fill_gradient(low = "#2F56A6", high = "#23417D") +
+  scale_x_discrete(labels = function(x) str_replace(x, "(^.*?\\n)(.*?)(\\n.*?)+$", "\\1\\2...")) +
+  labs(x = "Complaint type",
+       y = "Number of complaints") +
+  councildown::theme_nycc()
+```
+
+```{r}
+dist_all <- tbl(snapshots_db, "sr_week_district") %>%
+  filter(coun_dist == local(coun_dist)) %>%
+  select(-locations)
+```
+
+```{r}
+dist_all %>%
+  filter(week <= local(current_week)) %>%
+  group_by(week) %>%
+  summarize(n = sum(n)) %>%
+  collect() %>%
+  mutate(date = floor_date(ymd("2019-01-01")+(7*(week-1)), unit = "week") + 1) %>%
+  ggplot(aes(date, n,
+             text = paste0("Week of ", format(date, format = "%b %e"), ": ", n, " complaints"), group = 1, group = 1)) +
+  geom_point(color = "#23417D") +
+  geom_line(color = "#23417D") +
+  labs(x = "Week",
+       y = "Number of service requests") +
+  councildown::theme_nycc()
+```
+
+
+## Closed complaints
+
+```{r}
+dist_week <- tbl(snapshots_db, "sr_ind_top_10_week_district_closed") %>%
+  filter(coun_dist == local(coun_dist),
+         week == local(week)) %>%
+  collect_geo()
+```
+
+```{r}
+dist_week %>%
+  count(complaint_type) %>%
+  # wrap labels for prettiness
+  mutate(complaint_type = tools::toTitleCase(tolower(complaint_type)) %>%
+           str_wrap(15) %>%
+           reorder(n)) %>%
+  ggplot(aes(complaint_type, n, fill = complaint_type,
+             text = paste(complaint_type, n, sep = "<br>"))) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  labs(x = "Complaint type",
+       y = "Number of complaints") +
+  councildown::scale_fill_nycc() +
+  scale_x_discrete(labels = function(x) str_replace(x, "(^.*?\\n)(.*?)(\\n.*?)+$", "\\1\\2...")) +
+  councildown::theme_nycc(print = FALSE)
+```
+
+```{r}
+dat <- dist_week %>%
+  as.data.frame()
+pal <- colorFactor(councildown::nycc_pal()(length(unique(dat$complaint_type))),
+                   reorder(count(dat, complaint_type)$complaint_type, count(dat, complaint_type)$n))
+```
+
+```{r}
+map_data <- dist_week %>%
+  mutate(lon = st_coordinates(.)[,1], lat = st_coordinates(.)[,2]) %>%
+  as.data.frame() %>%
+  group_by(lon, lat, complaint_type) %>%
+  summarize(n = n(), created_date = paste0(created_date, collapse = "<br>"),
+            incident_address = paste0(unique(incident_address), collapse = "<br>")) %>%
+  st_as_sf(coords = c("lon", "lat"), crs = st_crs(dist_week))
+```
+
+```{r}
+bbox <- as.numeric(st_bbox(map_data))
+
+leaflet(map_data) %>%
+  councildown::addCouncilStyle() %>%
+  clearGroup("complaints") %>%
+  addCircleMarkers(radius = 4, weight = 15, fillOpacity = .8, opacity = 0,
+                   fillColor = ~pal(complaint_type)) %>% 
+  fitBounds(bbox[1], bbox[2], bbox[3], bbox[4])
+```
+
+
+```{r}
+dist_ytd <- tbl(snapshots_db, "sr_top_10_ytd_district_closed") %>%
+  filter(coun_dist == local(coun_dist)) %>%
+  select(-locations) %>%
+  collect()
+```
+
+```{r}
+dist_ytd %>%
+  mutate(complaint_type = tools::toTitleCase(tolower(complaint_type)) %>%
+           str_wrap(15) %>%
+           reorder(n_tot)) %>%
+  ggplot(aes(complaint_type, n_tot, fill = as.numeric(complaint_type),
+             text = paste(complaint_type, n_tot, sep = "<br>"))) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  scale_fill_gradient(low = "#2F56A6", high = "#23417D") +
+  scale_x_discrete(labels = function(x) str_replace(x, "(^.*?\\n)(.*?)(\\n.*?)+$", "\\1\\2...")) +
+  labs(x = "Complaint type",
+       y = "Number of complaints") +
+  councildown::theme_nycc()
+```
+
+```{r}
+dist_all <- tbl(snapshots_db, "sr_week_district_closed") %>%
+  filter(coun_dist == local(coun_dist)) %>%
+  select(-locations)
+```
+
+```{r}
+dist_all %>%
+  filter(week <= local(current_week)) %>%
+  group_by(week) %>%
+  summarize(n = sum(n)) %>%
+  collect() %>%
+  mutate(date = floor_date(ymd("2019-01-01")+(7*(week-1)), unit = "week") + 1) %>%
+  ggplot(aes(date, n,
+             text = paste0("Week of ", format(date, format = "%b %e"), ": ", n, " complaints"), group = 1, group = 1)) +
+  geom_point(color = "#23417D") +
+  geom_line(color = "#23417D") +
+  labs(x = "Week",
+       y = "Number of service requests") +
+  councildown::theme_nycc()
+```
+
+# OEM incidents
+
+```{r}
+oem_week_dist <- tbl(snapshots_db, "emergency_response") %>%
+  filter(date_part("week", creation_date) == local(week)) %>%
+  collect_geo() %>%
+  st_join(dists) %>%
+  rename(coun_dist_dat = coun_dist) %>% 
+  filter(coun_dist_dat == coun_dist) %>%
+  mutate(duration = closed_date - creation_date,
+         duration_pretty = ifelse(is.na(duration), "Ongoing as of last update", Fmt(duration)))
+```
+
+```{r}
+
+if (nrow(oem_week_dist) > 0){
+  bbox <- as.numeric(st_bbox(oem_week_dist))
+  
+  oem_week_dist %>% 
+    leaflet() %>%
+    councildown::addCouncilStyle() %>% 
+    addCircleMarkers(radius = ~ifelse(is.na(duration), 5, 25*sqrt(as.double(duration)/max(as.double(duration)))),
+                     popup = ~paste(incident_type, location, paste(creation_date, closed_date, sep = " - "), duration_pretty, sep = "<br>"),
+                     fillOpacity = .8, fillColor = ~ifelse(is.na(closed_date), "#D05D4E","#2F56A6"), opacity = 0, weight = 15,
+                     group = "oem_incidents") %>%
+    clearControls() %>%
+    flyToBounds(bbox[1], bbox[2], bbox[3], bbox[4], options = list(duration = .25))
+}
+```
+
+```{r}
+if (nrow(oem_week_dist) > 0){
+  oem_week_dist %>%
+    as.data.frame() %>%
+    select(incident_type, location, creation_date, closed_date) %>%
+    knitr::kable()
+}
+```
+
+`r if (nrow(oem_week_dist) == 0) {"No emergency incidents."}`
+
+
+# HPD vacate orders
+
+## Issued vacate orders
+
+
+```{r}
+issued_week_dist <- tbl(snapshots_db, "vacate_orders") %>%
+  filter(council_district == local(coun_dist),
+         date_part("week", vacate_effective_date) == local(week)) %>%
+  mutate(address = paste(number, street)) %>%
+  collect_geo()
+```
+
+
+```{r}
+if (nrow(issued_week_dist) > 0) {
+  bbox <- as.numeric(st_bbox(issued_week_dist()))
+  
+  leaflet() %>%
+    councildown::addCouncilStyle() %>%
+    addCircleMarkers(radius = 5,
+                     fillOpacity = .8, fillColor = "#2F56A6", opacity = 0, weight = 15,
+                     popup = ~paste(address, primary_vacate_reason, vacate_effective_date, sep = "<br>"),
+                     group = "issued") %>%
+    clearControls() %>%
+    flyToBounds(bbox[1], bbox[2], bbox[3], bbox[4], options = list(duration = .25))
+}
+```
+
+
+```{r}
+if (nrow(issued_week_dist) > 0) {
+  issued_week_dist %>%
+    as.data.frame() %>%
+    select(address, primary_vacate_reason, vacate_type, vacate_effective_date, number_of_vacated_units) %>%
+    knitr::kable()
+}
+```
+
+`r if (nrow(issued_week_dist) == 0) {"No issued vacate orders."}`
+
+## Rescinded vacate orders
+
+```{r}
+rescinded_week_dist <- tbl(snapshots_db, "vacate_orders") %>%
+  filter(council_district == local(coun_dist),
+         date_part("week", rescind_date) == local(week)) %>%
+  mutate(address = paste(number, street)) %>%
+  collect_geo()
+```
+
+
+```{r}
+if (nrow(rescinded_week_dist) > 0) {
+  bbox <- as.numeric(st_bbox(rescinded_week_dist()))
+  
+  leaflet() %>%
+    councildown::addCouncilStyle() %>%
+    addCircleMarkers(radius = 5,
+                     fillOpacity = .8, fillColor = "#2F56A6", opacity = 0, weight = 15,
+                     popup = ~paste(address, primary_vacate_reason, vacate_effective_date, sep = "<br>"),
+                     group = "rescinded") %>%
+    clearControls() %>%
+    flyToBounds(bbox[1], bbox[2], bbox[3], bbox[4], options = list(duration = .25))
+}
+```
+
+
+```{r}
+if (nrow(rescinded_week_dist) > 0) {
+  rescinded_week_dist %>%
+    as.data.frame() %>%
+    select(address, primary_vacate_reason, vacate_type, vacate_effective_date, number_of_vacated_units) %>%
+    knitr::kable()
+}
+```
+
+`r if (nrow(rescinded_week_dist) == 0) {"No rescinded vacate orders."}`
