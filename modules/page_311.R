@@ -39,6 +39,28 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
 
   myTrigger <- makeReactiveTrigger()
 
+  make_popup <- function(incident_type, num, address, created_dates) {
+
+    one_popup <- function(incident_type, num, address, created_dates){
+      type_out <- h5(incident_type)
+
+      num_out <- tags$small(tags$em(num, " incident(s)"))
+
+      address_out <- tags$small(tags$em(address))
+
+      out <- paste(type_out, "<br>",
+                   address_out, "<br>",
+                   num_out,
+                   tags$hr(),
+                   tags$strong("Created:"), "<br>",
+                   created_dates)
+
+      councildown::councilPopup(out)
+    }
+
+    pmap_chr(list(incident_type, num, address, created_dates), one_popup)
+  }
+
   # Get the data for the selected district and week
 
   if (open_calls) {
@@ -120,7 +142,7 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
       mutate(lon = st_coordinates(.)[,1], lat = st_coordinates(.)[,2]) %>%
       as.data.frame() %>%
       group_by(lon, lat, complaint_type) %>%
-      summarize(n = n(), created_date = paste0(created_date, collapse = "<br>"),
+      summarize(n = n(), created_date = paste0(scales::date_format(format = "%b %e %Y %I:%M %p")(sort(created_date)), collapse = "<br>"),
                 incident_address = paste0(unique(incident_address), collapse = "<br>")) %>%
       st_as_sf(coords = c("lon", "lat"), crs = st_crs(dist_week()))
   })
@@ -140,8 +162,8 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
       clearGroup("complaints") %>%
       addCircleMarkers(radius = ~4*sqrt(vapply(n, min, FUN.VALUE = numeric(1), 20)), weight = 15, fillOpacity = .8, opacity = 0,
                        fillColor = ~pal(complaint_type),
-                       popup = ~ paste(complaint_type, n, incident_address, created_date, sep = "<br>"),
-                       popupOptions = popupOptions(maxHeight = 100),
+                       popup = ~ make_popup(complaint_type, n, incident_address, created_date),
+                       popupOptions = popupOptions(maxHeight = 200),
                        group = "complaints") %>%
       clearControls() %>%
       flyToBounds(bbox[1], bbox[2], bbox[3], bbox[4], options = list(duration = .25))
@@ -166,8 +188,8 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
         clearGroup("complaints") %>%
         addCircleMarkers(radius = ~4*sqrt(vapply(n, min, FUN.VALUE = numeric(1), 20)), weight = 15, fillOpacity = .8, opacity = 0,
                          fillColor = ~pal(complaint_type),
-                         popup = ~ paste(complaint_type, n, incident_address, created_date, sep = "<br>"),
-                         popupOptions = popupOptions(maxHeight = 100),
+                         popup = ~ make_popup(complaint_type, n, incident_address, created_date),
+                         popupOptions = popupOptions(maxHeight = 200),
                          group = "complaints")
     }
   })
@@ -182,8 +204,8 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
       clearGroup("complaints") %>%
       addCircleMarkers(radius = ~4*sqrt(vapply(n, min, FUN.VALUE = numeric(1), 20)), weight = 15, fillOpacity = .8, opacity = 0,
                        fillColor = ~pal(complaint_type),
-                       popup = ~ paste(complaint_type, n, incident_address, created_date, sep = "<br>"),
-                       popupOptions = popupOptions(maxHeight = 100),
+                       popup = ~ make_popup(complaint_type, n, incident_address, created_date),
+                       popupOptions = popupOptions(maxHeight = 200),
                        group = "complaints") %>%
       clearControls() %>%
       flyToBounds(bbox[1], bbox[2], bbox[3], bbox[4], options = list(duration = .25))
