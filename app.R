@@ -52,7 +52,7 @@ sidebar <- dashboardSidebar(
     menuItem("HPD", icon = icon("home"),
              menuSubItem("Vacate orders", "vacate_issued"))
   ),
-  downloadButton("pdf_report", label = "Download PDF", style = "background-color: #fff;color: #444;display: block;margin: 12px 15px 0px 15px;")
+  downloadButton("pdf_report", label = "Download", style = "background-color: #fff;color: #444;display: block;margin: 12px 15px 0px 15px;")
 )
 
 body <- dashboardBody(
