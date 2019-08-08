@@ -4,6 +4,14 @@ library(tibble)
 library(ggplot2)
 library(dplyr)
 library(lubridate)
+library(extrafont)
+library(webshot)
+
+# dir.create("~/.fonts")
+# file.copy("www/Open_Sans/OpenSans-Regular.ttf'", "~/.fonts")
+# system('fc-cache -f ~/.fonts')
+
+webshot::install_phantomjs()
 
 options(spinner.color="#2F56A6")
 
@@ -90,7 +98,7 @@ server <- function(input, output, session) {
 
   output$pdf_report <- downloadHandler(
     # For PDF output, change this to "report.pdf"
-    filename = "report.pdf",
+    filename = "report.docx",
     content = function(file) {
       # Copy the report file to a temporary directory before processing it, in
       # case we don't have write permissions to the current working dir (which

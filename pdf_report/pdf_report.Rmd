@@ -2,13 +2,17 @@
 title: "Council district `r params$coun_dist`: `r params$week`"
 author: "Data Operations Unit"
 date: '`r councildown::pretty_date()`'
-output: 
-  councildown::council_pdf:
-    latex_engine: xelatex
+output:
+  bookdown::word_document2:
+    reference_docx: assets/word_theme.docx
+  # bookdown::pdf_document2: default
+  # councildown::council_pdf:
+  #   latex_engine: xelatex
   # councildown::council_html: default
 compact-title: true
 fontsize: 11pt
 subparagraph: yes
+always_allow_html: yes
 params:
   week: NA
   coun_dist: NA
@@ -19,10 +23,9 @@ header-includes:
 
 ```{r include = FALSE}
 library(ggplot2)
-library(councildown)
+# library(councildown)
 
-extrafont::loadfonts()
-knitr::knit_hooks$set(embed = hook_pdfembed)
+knitr::knit_hooks$set(embed = councildown::hook_pdfembed)
 knitr::opts_chunk$set(echo = FALSE, embed = TRUE, warning = FALSE, message = FALSE)
 knitr::opts_knit$set(root.dir = here::here())
 ```
@@ -44,8 +47,8 @@ library(leaflet)
 library(stringr)
 library(purrr)
 
-# utils <- list.files(path = "util", pattern = "\\.(R|r)$", full.names = TRUE)
-# lapply(utils, source)
+utils <- list.files(path = "util", pattern = "\\.(R|r)$", full.names = TRUE)
+lapply(utils, source)
 
 current_week <- tbl(snapshots_db, "sr_top_10_week_district_closed") %>%
   group_by(coun_dist) %>%
@@ -101,7 +104,7 @@ dist_week %>%
        y = "Number of complaints") +
   councildown::scale_fill_nycc() +
   scale_x_discrete(labels = function(x) str_replace(x, "(^.*?\\n)(.*?)(\\n.*?)+$", "\\1\\2...")) +
-  councildown::theme_nycc(print = FALSE)
+  theme_bw()
 ```
 
 ```{r}
@@ -121,7 +124,7 @@ map_data <- dist_week %>%
   st_as_sf(coords = c("lon", "lat"), crs = st_crs(dist_week))
 ```
 
-```{r}
+```{r screenshot.force = TRUE}
 bbox <- as.numeric(st_bbox(map_data))
 
 leaflet(map_data) %>%
@@ -153,7 +156,7 @@ dist_ytd %>%
   scale_x_discrete(labels = function(x) str_replace(x, "(^.*?\\n)(.*?)(\\n.*?)+$", "\\1\\2...")) +
   labs(x = "Complaint type",
        y = "Number of complaints") +
-  councildown::theme_nycc()
+  theme_bw()
 ```
 
 ```{r}
@@ -175,7 +178,7 @@ dist_all %>%
   geom_line(color = "#23417D") +
   labs(x = "Week",
        y = "Number of service requests") +
-  councildown::theme_nycc()
+  theme_bw()
 ```
 
 ```{r}
@@ -207,7 +210,7 @@ dist_week %>%
        y = "Number of complaints") +
   councildown::scale_fill_nycc() +
   scale_x_discrete(labels = function(x) str_replace(x, "(^.*?\\n)(.*?)(\\n.*?)+$", "\\1\\2...")) +
-  councildown::theme_nycc(print = FALSE)
+ theme_bw()
 ```
 
 ```{r}
@@ -227,7 +230,7 @@ map_data <- dist_week %>%
   st_as_sf(coords = c("lon", "lat"), crs = st_crs(dist_week))
 ```
 
-```{r}
+```{r screenshot.force = TRUE}
 bbox <- as.numeric(st_bbox(map_data))
 
 leaflet(map_data) %>%
@@ -259,7 +262,7 @@ dist_ytd %>%
   scale_x_discrete(labels = function(x) str_replace(x, "(^.*?\\n)(.*?)(\\n.*?)+$", "\\1\\2...")) +
   labs(x = "Complaint type",
        y = "Number of complaints") +
-  councildown::theme_nycc()
+  theme_bw()
 ```
 
 ```{r}
@@ -281,7 +284,7 @@ dist_all %>%
   geom_line(color = "#23417D") +
   labs(x = "Week",
        y = "Number of service requests") +
-  councildown::theme_nycc()
+  theme_bw()
 ```
 
 ```{r}
@@ -301,7 +304,7 @@ oem_week_dist <- tbl(snapshots_db, "emergency_response") %>%
          duration_pretty = ifelse(is.na(duration), "Ongoing as of last update", Fmt(duration)))
 ```
 
-```{r}
+```{r screenshot.force = TRUE}
 
 if (nrow(oem_week_dist) > 0){
   bbox <- as.numeric(st_bbox(oem_week_dist))
@@ -348,7 +351,7 @@ issued_week_dist <- tbl(snapshots_db, "vacate_orders") %>%
 ```
 
 
-```{r}
+```{r screenshot.force = TRUE}
 if (nrow(issued_week_dist) > 0) {
   bbox <- as.numeric(st_bbox(issued_week_dist()))
   
@@ -392,7 +395,7 @@ rescinded_week_dist <- tbl(snapshots_db, "vacate_orders") %>%
 ```
 
 
-```{r}
+```{r screenshot.force = TRUE}
 if (nrow(rescinded_week_dist) > 0) {
   bbox <- as.numeric(st_bbox(rescinded_week_dist))
   rescinded_week_dist %>% 
