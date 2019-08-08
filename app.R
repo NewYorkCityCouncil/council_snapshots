@@ -4,6 +4,14 @@ library(tibble)
 library(ggplot2)
 library(dplyr)
 library(lubridate)
+library(extrafont)
+library(webshot)
+
+# dir.create("~/.fonts")
+# file.copy("www/Open_Sans/OpenSans-Regular.ttf'", "~/.fonts")
+# system('fc-cache -f ~/.fonts')
+
+webshot::install_phantomjs()
 
 options(spinner.color="#2F56A6")
 
@@ -43,7 +51,8 @@ sidebar <- dashboardSidebar(
              menuSubItem("Emergency incidents", "oem_created")),
     menuItem("HPD", icon = icon("home"),
              menuSubItem("Vacate orders", "vacate_issued"))
-  )
+  ),
+  downloadButton("pdf_report", label = "Download PDF", style = "background-color: #fff;color: #444;display: block;margin: 12px 15px 0px 15px;")
 )
 
 body <- dashboardBody(
@@ -85,6 +94,46 @@ server <- function(input, output, session) {
   callModule(page_vacate, id = "hpd_vacate",
              coun_dist = reactive(input$coun_dist),
              week = reactive(input$week))
+
+
+  output$pdf_report <- downloadHandler(
+    # For PDF output, change this to "report.pdf"
+    filename = "report.docx",
+    content = function(file) {
+      # Copy the report file to a temporary directory before processing it, in
+      # case we don't have write permissions to the current working dir (which
+      # can happen when deployed).
+
+      tmp_dir <- tempdir()
+
+      # tempReport <- file.path(tmp_dir))
+      file.copy("pdf_report/", tmp_dir, overwrite = TRUE, recursive = TRUE)
+
+      # print(list.files(tmp_dir))
+
+      # Set up parameters to pass to Rmd document
+      params <- list(coun_dist = input$coun_dist,
+                     week = input$week)
+
+      # Knit the document, passing in the `params` list, and eval it in a
+      # child of the global environment (this isolates the code in the document
+      # from the code in this app).
+      # showModal(modalDialog(
+      #   title = "Generating report",
+      #   "Crunching the freshest data just for you! This might take a minute."
+      # ))
+
+      withProgress({
+        rmarkdown::render(file.path(tmp_dir, "pdf_report", "pdf_report.Rmd"), output_file = file,
+                        params = params, envir = new.env()
+        )},
+        value = .1,
+        message = "Generating report",
+        detail = "Crunching the freshest data just for you!")
+
+
+    }
+  )
 }
 
 shinyApp(ui, server)
