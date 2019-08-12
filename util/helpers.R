@@ -32,3 +32,13 @@ makeReactiveTrigger <- function() {
     }
   )
 }
+
+
+help_tooltip <- function(id, title, content) {
+  tagList(
+    span(style = "position:absolute;right:10px;bottom:10px",
+      id = id,
+      tags$i(class="fa fa-info-circle")),
+    bsPopover(id, title, content, options = list(container = "body"))
+  )
+}

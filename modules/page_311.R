@@ -4,6 +4,7 @@ library(purrr)
 library(plotly)
 library(shinycssloaders)
 
+
 # Create module ui
 page_311_ui <- function(id, open_calls = TRUE) {
 
@@ -14,10 +15,22 @@ page_311_ui <- function(id, open_calls = TRUE) {
     # Row to hold plots
     h3("This week:"),
     fluidRow(
-      box(title = "Top service requests", solidHeader = TRUE,
+      box(title = tagList("Top service requests",
+                          help_tooltip(ns("top-sr"),
+                                       "See the top service requests",
+                                       paste("These are the most common service requests",
+                                             ifelse(open_calls, "opened", "closed"),
+                                             "this week. Click a bar to filter the map."))), solidHeader = TRUE,
           plotlyOutput(ns("complaint_type_cd_week"), height = "420px") %>% withSpinner()
       ),
-      box(title = "Service request locations", solidHeader = TRUE,
+      box(title = tagList("Service request locations",
+                          help_tooltip(ns("sr-locations"),
+                                       "Find 311 requests in your district",
+                                       paste("This map shows the location of different 311",
+                                             "service requests. Size shows how many requests",
+                                             "were made and color shows the request type.",
+                                             "Click the points for more info."))),
+          solidHeader = TRUE,
           leafletOutput(ns("complaint_map")) %>% withSpinner(),
           actionLink(ns("reset_map"), "Reset map")
           # uiOutput(ns("map_legend"))
@@ -25,9 +38,20 @@ page_311_ui <- function(id, open_calls = TRUE) {
     ),
     h3("Year to date:"),
     fluidRow(
-      box(title = "Top service requests", solidHeader = TRUE,
+      box(title = tagList("Top service requests",
+                          help_tooltip(ns("top-sr-ytd"),
+                                       "Top service requests this year",
+                                       paste("These are the most common service requests",
+                                             ifelse(open_calls, "opened", "closed"),
+                                             "this year."))), solidHeader = TRUE,
           plotlyOutput(ns("complaint_type_cd_ytd")) %>% withSpinner()),
-      box(title = "Number of service requests per week", solidHeader = TRUE,
+      box(title = tagList("Number of service requests per week",
+                          help_tooltip(ns("total-sr-ytd"),
+                                       "All service requests",
+                                       paste("Here is the total number of service requests",
+                                             ifelse(open_calls, "opened", "closed"),
+                                             "this year, regardless of type."))),
+          solidHeader = TRUE,
           plotlyOutput(ns("complaint_num_cd_ytd")) %>% withSpinner())
     )
   )

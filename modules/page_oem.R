@@ -9,10 +9,21 @@ page_oem_ui <- function(id) {
   fluidPage(
 
     fluidRow(
-      box(width = 12, title = "Emergency incident map",
+      box(width = 12,
+          title = tagList("Emergency incident map",
+                          help_tooltip(ns("oem-map-box"),
+                                       "Location of emergency incidents",
+                                       paste("This map shows the location of emergency",
+                                             "incidents this week. The size shows the",
+                                             "total length of the emergency."))),
           leafletOutput(ns("oem_map")) %>% withSpinner())),
     fluidRow(
-      box(width = 12, title = "Emergency incidents",
+      box(width = 12,
+          title = tagList("Emergency incidents",
+                          help_tooltip(ns("oem-table-box"),
+                                       "List of emergency incidents",
+                                       paste("Here are more details about all the",
+                                             "emergency incidnets this week."))),
           DT::dataTableOutput(ns("oem_table")) %>% withSpinner()))
   )
 }

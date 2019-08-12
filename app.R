@@ -6,6 +6,7 @@ library(dplyr)
 library(lubridate)
 library(extrafont)
 library(webshot)
+library(shinyBS)
 
 # dir.create("~/.fonts")
 # file.copy("www/Open_Sans/OpenSans-Regular.ttf'", "~/.fonts")
@@ -52,7 +53,9 @@ sidebar <- dashboardSidebar(
     menuItem("HPD", icon = icon("home"),
              menuSubItem("Vacate orders", "vacate_issued"))
   ),
-  downloadButton("pdf_report", label = "Download", style = "background-color: #fff;color: #444;display: block;margin: 12px 15px 0px 15px;")
+  tipify(downloadButton("pdf_report", label = "Download",
+                 style = "background-color: #fff;color: #444;display: block;margin: 12px 15px 0px 15px;"),
+         "Download a printable copy of this dashboard in Microsoft Word format.")
 )
 
 body <- dashboardBody(
