@@ -48,7 +48,7 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
 
       address_out <- tags$small(tags$em(address))
 
-      out <- paste(type_out, "<br>",
+      out <- paste0(type_out, "<br>",
                    address_out, "<br>",
                    num_out,
                    tags$hr(),
