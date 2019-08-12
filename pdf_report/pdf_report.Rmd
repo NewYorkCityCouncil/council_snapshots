@@ -78,9 +78,9 @@ Fmt.default <- function(x) {
 
 ```
 
-# 311 complaints
+# 311 service requests
 
-## Opened Complaints
+## Submitted Service Requests
 
 ```{r}
 dist_week <- tbl(snapshots_db, "sr_ind_top_10_week_district") %>%
@@ -101,7 +101,7 @@ dist_week %>%
   geom_col(show.legend = FALSE) +
   coord_flip() +
   labs(x = "Complaint type",
-       y = "Number of complaints") +
+       y = "Number of service requests") +
   councildown::scale_fill_nycc() +
   scale_x_discrete(labels = function(x) str_replace(x, "(^.*?\\n)(.*?)(\\n.*?)+$", "\\1\\2...")) +
   theme_bw()
@@ -155,7 +155,7 @@ dist_ytd %>%
   scale_fill_gradient(low = "#2F56A6", high = "#23417D") +
   scale_x_discrete(labels = function(x) str_replace(x, "(^.*?\\n)(.*?)(\\n.*?)+$", "\\1\\2...")) +
   labs(x = "Complaint type",
-       y = "Number of complaints") +
+       y = "Number of service requests") +
   theme_bw()
 ```
 
@@ -173,7 +173,7 @@ dist_all %>%
   collect() %>%
   mutate(date = floor_date(ymd("2019-01-01")+(7*(week-1)), unit = "week") + 1) %>%
   ggplot(aes(date, n,
-             text = paste0("Week of ", format(date, format = "%b %e"), ": ", n, " complaints"), group = 1, group = 1)) +
+             text = paste0("Week of ", format(date, format = "%b %e"), ": ", n, " service requests"), group = 1, group = 1)) +
   geom_point(color = "#23417D") +
   geom_line(color = "#23417D") +
   labs(x = "Week",
@@ -186,7 +186,7 @@ setProgress(.2)
 ```
 
 
-## Closed complaints
+## Closed service requests
 
 ```{r}
 dist_week <- tbl(snapshots_db, "sr_ind_top_10_week_district_closed") %>%
@@ -207,7 +207,7 @@ dist_week %>%
   geom_col(show.legend = FALSE) +
   coord_flip() +
   labs(x = "Complaint type",
-       y = "Number of complaints") +
+       y = "Number of service requests") +
   councildown::scale_fill_nycc() +
   scale_x_discrete(labels = function(x) str_replace(x, "(^.*?\\n)(.*?)(\\n.*?)+$", "\\1\\2...")) +
  theme_bw()
@@ -261,7 +261,7 @@ dist_ytd %>%
   scale_fill_gradient(low = "#2F56A6", high = "#23417D") +
   scale_x_discrete(labels = function(x) str_replace(x, "(^.*?\\n)(.*?)(\\n.*?)+$", "\\1\\2...")) +
   labs(x = "Complaint type",
-       y = "Number of complaints") +
+       y = "Number of service requests") +
   theme_bw()
 ```
 
@@ -279,7 +279,7 @@ dist_all %>%
   collect() %>%
   mutate(date = floor_date(ymd("2019-01-01")+(7*(week-1)), unit = "week") + 1) %>%
   ggplot(aes(date, n,
-             text = paste0("Week of ", format(date, format = "%b %e"), ": ", n, " complaints"), group = 1, group = 1)) +
+             text = paste0("Week of ", format(date, format = "%b %e"), ": ", n, " service requests"), group = 1, group = 1)) +
   geom_point(color = "#23417D") +
   geom_line(color = "#23417D") +
   labs(x = "Week",

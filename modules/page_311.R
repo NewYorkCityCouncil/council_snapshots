@@ -14,10 +14,10 @@ page_311_ui <- function(id, open_calls = TRUE) {
     # Row to hold plots
     h3("This week:"),
     fluidRow(
-      box(title = "Top complaints", solidHeader = TRUE,
+      box(title = "Top service requests", solidHeader = TRUE,
           plotlyOutput(ns("complaint_type_cd_week"), height = "420px") %>% withSpinner()
       ),
-      box(title = "Complaint locations", solidHeader = TRUE,
+      box(title = "Service request locations", solidHeader = TRUE,
           leafletOutput(ns("complaint_map")) %>% withSpinner(),
           actionLink(ns("reset_map"), "Reset map")
           # uiOutput(ns("map_legend"))
@@ -25,9 +25,9 @@ page_311_ui <- function(id, open_calls = TRUE) {
     ),
     h3("Year to date:"),
     fluidRow(
-      box(title = "Top complaints", solidHeader = TRUE,
+      box(title = "Top service requests", solidHeader = TRUE,
           plotlyOutput(ns("complaint_type_cd_ytd")) %>% withSpinner()),
-      box(title = "Number of complaints per week", solidHeader = TRUE,
+      box(title = "Number of service requests per week", solidHeader = TRUE,
           plotlyOutput(ns("complaint_num_cd_ytd")) %>% withSpinner())
     )
   )
@@ -107,8 +107,8 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
                  text = paste(complaint_type, n, sep = "<br>"))) +
       geom_col(show.legend = FALSE) +
       coord_flip() +
-      labs(x = "Complaint type",
-           y = "Number of complaints") +
+      labs(x = "Service request type",
+           y = "Number of service requests") +
       councildown::scale_fill_nycc() +
       scale_x_discrete(labels = function(x) str_replace(x, "(^.*?\\n)(.*?)(\\n.*?)+$", "\\1\\2...")) +
       councildown::theme_nycc(print = FALSE)
@@ -270,8 +270,8 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
       coord_flip() +
       scale_fill_gradient(low = "#2F56A6", high = "#23417D") +
       scale_x_discrete(labels = function(x) str_replace(x, "(^.*?\\n)(.*?)(\\n.*?)+$", "\\1\\2...")) +
-      labs(x = "Complaint type",
-           y = "Number of complaints") +
+      labs(x = "service request type",
+           y = "Number of service requests") +
       councildown::theme_nycc()
 
     nycc_ggplotly(p)
@@ -302,7 +302,7 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
       collect() %>%
       mutate(date = floor_date(ymd("2019-01-01")+(7*(week-1)), unit = "week") + 1) %>%
       ggplot(aes(date, n,
-                 text = paste0("Week of ", format(date, format = "%b %e"), ": ", n, " complaints"), group = 1, group = 1)) +
+                 text = paste0("Week of ", format(date, format = "%b %e"), ": ", n, " service requests"), group = 1, group = 1)) +
       geom_point(color = "#23417D") +
       geom_line(color = "#23417D") +
       labs(x = "Week",

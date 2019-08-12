@@ -45,8 +45,8 @@ sidebar <- dashboardSidebar(
   selectInput("week", "Week", week_labels, selected = current_week),
   sidebarMenu(
     menuItem("311", icon = icon("phone"),
-             menuSubItem("Opened complaints", "311_opened"),
-             menuSubItem("Closed complaints", "311_closed")),
+             menuSubItem("Submitted service requests", "311_opened"),
+             menuSubItem("Closed service requests", "311_closed")),
     menuItem("OEM", icon = icon("warning"),
              menuSubItem("Emergency incidents", "oem_created")),
     menuItem("HPD", icon = icon("home"),
