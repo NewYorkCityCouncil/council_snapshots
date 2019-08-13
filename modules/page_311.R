@@ -79,7 +79,8 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
                    tags$strong("Created:"), "<br>",
                    created_dates)
 
-      councildown::councilPopup(out)
+      # councildown::councilPopup(out)
+      out
     }
 
     pmap_chr(list(incident_type, num, address, created_dates), one_popup)
