@@ -60,7 +60,7 @@ sidebar <- dashboardSidebar(
 
 body <- dashboardBody(
   tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "council.css"),
-  tags$script(async = NA, src="https://www.googletagmanager.com/gtag/js?id=UA-111461633-2"),
+  # tags$script(async = NA, src="https://www.googletagmanager.com/gtag/js?id=UA-111461633-2"),
   includeScript("analytics.js")),
   tabItems(
     tabItem("311_opened",
