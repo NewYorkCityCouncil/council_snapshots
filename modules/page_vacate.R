@@ -127,7 +127,7 @@ page_vacate <- function(input, output, session, coun_dist, week) {
       box(title = tagList("No vacate orders rescinded",
                           help_tooltip(ns("no-rescinded-vacate-table"),
                                        "No vacate orders rescinded this week",
-                                       paste("Many weeks don't contain any vacate orders."))))
+                                       paste("Many weeks do not contain any vacate orders."))))
     }
   })
 
