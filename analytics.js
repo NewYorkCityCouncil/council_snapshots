@@ -31,7 +31,7 @@ $(document).on('change', '#week', function(e) {
 });
 
 // Track report download
-$(document).on('click', '#pdf_report', function(e) {
+$(document).on('click', '#pdf_report', function() {
   ga('send', {
               'hitType': 'event',
               'eventCategory': 'report download',
@@ -41,13 +41,14 @@ $(document).on('click', '#pdf_report', function(e) {
 });
 
 // Track link clicks
-$(document).on('click', 'a', function(e) {
+$(document).on('click', '.treeview-menu li a', function(e) {
   ga('send', {
               'hitType': 'event',
               'eventCategory': 'link',
               'eventAction': 'click',
-              'eventLabel': $(e).attr('href')
+              'eventLabel': $(this).attr('href')
             });
+   console.log($(this).attr('href'));
 });
 
 
