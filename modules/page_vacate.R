@@ -137,7 +137,9 @@ page_vacate <- function(input, output, session, coun_dist, week) {
     issued_week_dist() %>%
       as.data.frame() %>%
       select(address, primary_vacate_reason, vacate_type, vacate_effective_date, number_of_vacated_units) %>%
-      DT::datatable(options = list(scrollX = TRUE, scrollY = TRUE))
+      DT::datatable(colnames = c("Address", "Vacate reason", "Order type",
+                                 "Effective date", "Number of vacated units"),
+                    options = list(scrollX = TRUE, scrollY = TRUE))
   })
 
   output$rescinded_table_output <- DT::renderDataTable({
@@ -145,7 +147,10 @@ page_vacate <- function(input, output, session, coun_dist, week) {
 
     rescinded_week_dist() %>%
       as.data.frame() %>%
-      select(address, primary_vacate_reason, vacate_type, vacate_effective_date, number_of_vacated_units) %>%
-      DT::datatable(options = list(scrollX = TRUE, scrollY = TRUE))
+      select(address, primary_vacate_reason, vacate_type, vacate_effective_date, rescind_date, number_of_vacated_units) %>%
+      DT::datatable(colnames = c("Address", "Vacate reason", "Order type",
+                                 "Effective date", "Rescinded date",
+                                 "Number of vacated units"),
+                    options = list(scrollX = TRUE, scrollY = TRUE))
   })
 }
