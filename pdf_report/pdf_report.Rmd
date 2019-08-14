@@ -1,7 +1,7 @@
 ---
 title: "Council Snapshots"
 subtitle: "District `r params$coun_dist`: `r params$week`"
-author: "Data Operations Unit"
+# author: "Data Operations Unit"
 date: '`r councildown::pretty_date()`'
 output:
   bookdown::word_document2:
