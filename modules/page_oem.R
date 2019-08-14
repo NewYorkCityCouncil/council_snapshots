@@ -87,7 +87,7 @@ page_oem <- function(input, output, session, week, coun_dist) {
       as.data.frame() %>%
       select(incident_type, location, creation_date, closed_date) %>%
       mutate(creation_date = format(creation_date, format = "%b %e %Y %I:%M %p"),
-             closed_date = format(closed_date, format = "%b %e %Y %I:%M %p"))
+             closed_date = format(closed_date, format = "%b %e %Y %I:%M %p")) %>%
       DT::datatable(colnames = c("Incident type", "Location", "Created at", "Closed at"),
                     height = "400px", options = list(scrollX = TRUE, scrollY = TRUE))
   })
