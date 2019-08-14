@@ -48,7 +48,6 @@ $(document).on('click', '.treeview-menu li a', function(e) {
               'eventAction': 'click',
               'eventLabel': $(this).attr('href')
             });
-   console.log($(this).attr('href'));
 });
 
 
