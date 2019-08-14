@@ -28,7 +28,7 @@ page_311_ui <- function(id, open_calls = TRUE) {
                                        "Find 311 requests in your district",
                                        paste("This map shows the location of different 311",
                                              "service requests. Size shows how many requests",
-                                             "were made and color shows the request type.",
+                                             "were made at that location and color shows the request type.",
                                              "Click the points for more info."))),
           solidHeader = TRUE,
           leafletOutput(ns("complaint_map")) %>% withSpinner(),
