@@ -73,9 +73,9 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
 
     out <- paste(type_out,
                  address_out,
-                 num_out,
+                 paste(num_out,
                  tags$hr(),
-                 tags$strong("Created:"),
+                 tags$strong("Created:")),
                  created_dates, sep = "<br>")
 
     out
