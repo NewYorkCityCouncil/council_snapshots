@@ -65,25 +65,20 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
 
   make_popup <- function(incident_type, num, address, created_dates) {
 
-    one_popup <- function(incident_type, num, address, created_dates){
-      type_out <- h5(incident_type)
+    type_out <- paste0("<h5>", incident_type, "</h5>")
 
-      num_out <- tags$small(tags$em(num, " incident(s)"))
+    num_out <- paste0("<small><em>", num, " incident(s)", "</em></small>")
 
-      address_out <- tags$small(tags$em(address))
+    address_out <- paste0("<small><em>", address, "</em></small>")
 
-      out <- paste0(type_out, "<br>",
-                   address_out, "<br>",
-                   num_out,
-                   tags$hr(),
-                   tags$strong("Created:"), "<br>",
-                   created_dates)
+    out <- paste(type_out,
+                 address_out,
+                 num_out,
+                 tags$hr(),
+                 tags$strong("Created:"),
+                 created_dates, sep = "<br>")
 
-      # councildown::councilPopup(out)
-      out
-    }
-
-    pmap_chr(list(incident_type, num, address, created_dates), one_popup)
+    out
   }
 
   # Get the data for the selected district and week
