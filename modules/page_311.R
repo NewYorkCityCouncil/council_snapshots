@@ -13,7 +13,7 @@ page_311_ui <- function(id, open_calls = TRUE) {
 
   fluidPage(
     # Row to hold plots
-    h3("This week:"),
+    uiOutput(ns("week_header")),
     fluidRow(
       box(title = tagList("Top service requests",
                           help_tooltip(ns("top-sr"),
@@ -59,7 +59,7 @@ page_311_ui <- function(id, open_calls = TRUE) {
 
 # Create module server function
 # Needs coun_dist and week global inputs (passed from callModule in main app)
-page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE, current_week) {
+page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE, current_week, weeks) {
 
   myTrigger <- makeReactiveTrigger()
 
@@ -82,6 +82,12 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
   }
 
   # Get the data for the selected district and week
+
+  output$week_header <- renderUI({
+    this_week <- weeks$label[which(weeks$week_n == week())]
+
+    h3("Week of", this_week)
+  })
 
   if (open_calls) {
 
