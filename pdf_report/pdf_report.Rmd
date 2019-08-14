@@ -1,9 +1,11 @@
 ---
-title: "Council district `r params$coun_dist`: `r params$week`"
+title: "Council Snapshots"
+subtitle: "District `r params$coun_dist`: `r params$week`"
 author: "Data Operations Unit"
 date: '`r councildown::pretty_date()`'
 output:
   bookdown::word_document2:
+    toc: yes
     reference_docx: assets/word_theme.docx
   # bookdown::pdf_document2: default
   # councildown::council_pdf:
