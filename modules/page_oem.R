@@ -74,7 +74,7 @@ page_oem <- function(input, output, session, week, coun_dist) {
 
     leafletProxy("oem_map", data = oem_week_dist()) %>%
       clearGroup("oem_incidents") %>%
-      addCircleMarkers(radius = ~ifelse(is.na(duration), 5, 25*sqrt(as.double(duration)/max(as.double(duration)))),
+      addCircleMarkers(radius = ~ifelse(is.na(duration), 5, 25*sqrt(as.double(duration)/max(as.double(duration), na.rm = TRUE))),
                        popup = ~paste(incident_type, location, paste(creation_date, closed_date, sep = " - "), duration_pretty, sep = "<br>"),
                        fillOpacity = .8, fillColor = ~ifelse(is.na(closed_date), "#D05D4E","#2F56A6"), opacity = 0, weight = 15,
                        group = "oem_incidents") %>%
