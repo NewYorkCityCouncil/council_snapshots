@@ -38,6 +38,7 @@ weeks <- tibble(week_n = 1:current_week) %>%
 week_labels <- weeks %>% pull(week_n)
 names(week_labels) <- weeks %>% pull(label)
 
+
 header <- dashboardHeader(title = "")
 
 sidebar <- dashboardSidebar(
