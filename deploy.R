@@ -7,7 +7,7 @@ clean_name <- function(str) {
 app_name <- "council_snapshots"
 branch_name <- repository_head()$name
 
-if(branch_name != master) {
+if(branch_name != "master") {
   rsconnect::deployApp(appName = clean_name(paste(app_name, "staging", branch_name, sep = "-")))
 } else {
   rsconnect::deployApp(appName = app_name)
