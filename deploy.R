@@ -12,3 +12,4 @@ if(branch_name != master) {
 } else {
   rsconnect::deployApp(appName = app_name)
 }
+
