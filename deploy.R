@@ -1,7 +1,7 @@
 library(git2r)
 
 clean_name <- function(str) {
-  stringr::str_remove_all(str, "[^a-zA-Z0-9\\-_]")
+  gsub("[^a-zA-Z0-9_\\-]", "", str)
 }
 
 app_name <- "council_snapshots"
