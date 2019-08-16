@@ -12,6 +12,7 @@ library(plotly)
 library(shinycssloaders)
 library(leaflet)
 library(councilsnapshots)
+library(shinyBS)
 
 # dir.create("~/.fonts")
 # file.copy("www/Open_Sans/OpenSans-Regular.ttf'", "~/.fonts")

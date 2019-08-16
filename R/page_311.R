@@ -6,7 +6,7 @@
 #' @return A shiny UI
 #' @export
 #'
-#' @import sf leaflet stringr purrr plotly shinycssloaders
+#' @import sf leaflet stringr purrr plotly shinycssloaders shinyBS
 page_311_ui <- function(id, open_calls = TRUE) {
 
   # Namespace for module
