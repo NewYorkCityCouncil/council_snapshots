@@ -15,10 +15,21 @@ page_oem_ui <- function(id) {
   fluidPage(
 
     fluidRow(
-      box(width = 12, title = "Emergency incident map",
+      box(width = 12,
+          title = tagList("Emergency incident map",
+                          help_tooltip(ns("oem-map-box"),
+                                       "Location of emergency incidents",
+                                       paste("This map shows the location of emergency",
+                                             "incidents this week. The size shows the",
+                                             "total length of the emergency."))),
           leafletOutput(ns("oem_map")) %>% withSpinner())),
     fluidRow(
-      box(width = 12, title = "Emergency incidents",
+      box(width = 12,
+          title = tagList("Emergency incidents",
+                          help_tooltip(ns("oem-table-box"),
+                                       "List of emergency incidents",
+                                       paste("Here are more details about all the",
+                                             "emergency incidnets this week."))),
           DT::dataTableOutput(ns("oem_table")) %>% withSpinner()))
   )
 }
@@ -91,7 +102,7 @@ page_oem <- function(input, output, session, week, coun_dist, snapshots_db) {
 
     leafletProxy("oem_map", data = oem_week_dist()) %>%
       clearGroup("oem_incidents") %>%
-      addCircleMarkers(radius = ~ifelse(is.na(duration), 5, 25*sqrt(as.double(duration)/max(as.double(duration)))),
+      addCircleMarkers(radius = ~ifelse(is.na(duration), 5, 25*sqrt(as.double(duration)/max(as.double(duration), na.rm = TRUE))),
                        popup = ~paste(incident_type, location, paste(creation_date, closed_date, sep = " - "), duration_pretty, sep = "<br>"),
                        fillOpacity = .8, fillColor = ~ifelse(is.na(closed_date), "#D05D4E","#2F56A6"), opacity = 0, weight = 15,
                        group = "oem_incidents") %>%
@@ -103,7 +114,10 @@ page_oem <- function(input, output, session, week, coun_dist, snapshots_db) {
     oem_week_dist() %>%
       as.data.frame() %>%
       select(incident_type, location, creation_date, closed_date) %>%
-      DT::datatable(height = "400px", options = list(scrollX = TRUE, scrollY = TRUE))
+      mutate(creation_date = format(creation_date, format = "%b %e %Y %I:%M %p"),
+             closed_date = format(closed_date, format = "%b %e %Y %I:%M %p")) %>%
+      DT::datatable(colnames = c("Incident type", "Location", "Created at", "Closed at"),
+                    height = "400px", options = list(scrollX = TRUE, scrollY = TRUE))
   })
 
 }
