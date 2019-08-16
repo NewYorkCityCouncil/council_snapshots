@@ -1,3 +1,10 @@
+#' HPD Vacate Order UI
+#'
+#' @param id Unique ID
+#'
+#' @export
+#'
+#' @import sf leaflet stringr purrr plotly shinycssloaders shinydashboard
 page_vacate_ui <- function(id) {
   ns <- NS(id)
 
@@ -24,7 +31,18 @@ page_vacate_ui <- function(id) {
   )
 }
 
-page_vacate <- function(input, output, session, coun_dist, week) {
+#' HPD Vacate Order Server
+#'
+#' @param input Shiny input
+#' @param output Shiny output
+#' @param session Shiny session
+#' @param coun_dist reactive value holding selected council district
+#' @param week reactive value holding selected week
+#' @param snapshots_db The pool object holding database connections
+#'
+#' @export
+#'
+page_vacate <- function(input, output, session, coun_dist, week, snapshots_db) {
 
   ns <- session$ns
 

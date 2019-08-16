@@ -1,7 +1,13 @@
 
-dists <- tbl(snapshots_db, "council_districts") %>%
-  collect_geo()
 
+#' OEM UI
+#'
+#' @param id Unique id
+#'
+#' @return A shiny UI
+#' @export
+#'
+#' @import sf leaflet stringr purrr plotly shinycssloaders shinydashboard
 page_oem_ui <- function(id) {
 
   ns <- NS(id)
@@ -28,7 +34,16 @@ page_oem_ui <- function(id) {
   )
 }
 
-Fmt <- function(x) UseMethod("Fmt")
+#' Difftime formaters
+#'
+#' @param x a difftime
+#'
+#' @return Character vector
+#' @export
+#'
+Fmt <- function(x) {
+  UseMethod("Fmt")
+}
 Fmt.difftime <- function(x) {
   units(x) <- "secs"
   x <- unclass(x)
@@ -45,7 +60,20 @@ Fmt.default <- function(x) {
 }
 
 
-page_oem <- function(input, output, session, week, coun_dist) {
+#' OEM Server
+#'
+#' @param input Shiny input
+#' @param output Shiny output
+#' @param session Shiny session
+#' @param coun_dist reactive value holding selected council district
+#' @param week reactive value holding selected week
+#' @param snapshots_db The pool object holding database connections
+#'
+#' @export
+#'
+page_oem <- function(input, output, session, week, coun_dist, snapshots_db) {
+  dists <- tbl(snapshots_db, "council_districts") %>%
+    collect_geo()
 
 
   trigger <- makeReactiveTrigger()

@@ -1,3 +1,18 @@
+#' nycc_ggplotly
+#'
+#' Create plotly plots that meet NYCC guidelines
+#'
+#' @param p a ggplot
+#' @param toolbar include toolbar?
+#' @param zoom allow zooming?
+#' @param legend show legend?
+#' @param ... further arguments passed to \code{ggplotly()}
+#'
+#' @return a plotly htmlwidget
+#' @export
+#'
+#'
+#' @importFrom plotly ggplotly config layout hide_legend
 nycc_ggplotly <- function(p, toolbar = FALSE, zoom = FALSE, legend = FALSE, ...) {
   stopifnot(inherits(p, "gg"))
 
@@ -20,9 +35,21 @@ nycc_ggplotly <- function(p, toolbar = FALSE, zoom = FALSE, legend = FALSE, ...)
   p
 }
 
+#' makeReactiveTrigger
+#'
+#' Manually tie together reactive expressions and observers
+#'
+#' @return a list containing functions \code{depend()} and \code{trigger()}
+#' @export
+#'
+#'
+#' @importFrom shiny reactiveValues isolate
+#' @importFrom utils head
+
 makeReactiveTrigger <- function() {
   rv <- reactiveValues(a = 0)
   list(
+
     depend = function() {
       rv$a
       invisible()
