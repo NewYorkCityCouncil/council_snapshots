@@ -25,8 +25,6 @@ page_311(input, output, session, coun_dist, week, open_calls = TRUE,
 \item{weeks}{List of weeks}
 
 \item{snapshots_db}{The pool object holding database connections}
-
-\item{weeks}{}
 }
 \description{
 Create module server function
