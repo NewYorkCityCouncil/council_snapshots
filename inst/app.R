@@ -6,20 +6,46 @@ library(dplyr)
 library(lubridate)
 library(extrafont)
 library(webshot)
+library(stringr)
+library(pool)
+library(plotly)
+library(shinycssloaders)
+library(leaflet)
 
 # dir.create("~/.fonts")
 # file.copy("www/Open_Sans/OpenSans-Regular.ttf'", "~/.fonts")
 # system('fc-cache -f ~/.fonts')
 
+# credentials are stored as environment variables
+host <- Sys.getenv("SNAPSHOTS_DB_HOST")
+user <- Sys.getenv("SNAPSHOTS_DB_USER")
+pw <- Sys.getenv("SNAPSHOTS_DB_PW")
+
+# Create a pool of database connections. This way the app can send concurrent
+# queries when multiple users are requesting data
+snapshots_db <- pool::dbPool(
+  drv = RPostgreSQL::PostgreSQL(),
+  dbname = "snapshots",
+  host = host,
+  user = user,
+  password = pw
+)
+
+# Make sure we close database connections when the app exits
+onStop(function() {
+  poolClose(snapshots_db)
+})
+
+
 webshot::install_phantomjs()
 
 options(spinner.color="#2F56A6")
 
-utils <- list.files(path = "util", pattern = "\\.(R|r)$", full.names = TRUE)
-lapply(utils, source)
-
-modules <- list.files(path = "modules", pattern = "\\.(R|r)$", full.names = TRUE)
-lapply(modules, source)
+# utils <- list.files(path = "util", pattern = "\\.(R|r)$", full.names = TRUE)
+# lapply(utils, source)
+#
+# modules <- list.files(path = "modules", pattern = "\\.(R|r)$", full.names = TRUE)
+# lapply(modules, source)
 
 current_week <- tbl(snapshots_db, "sr_top_10_week_district_closed") %>%
   group_by(coun_dist) %>%
@@ -79,7 +105,9 @@ server <- function(input, output, session) {
   callModule(page_311, id = "num_complaints",
              coun_dist = reactive(input$coun_dist),
              week = reactive(input$week),
-             current_week = current_week)
+             open = TRUE,
+             current_week = current_week,
+             snapshots_db)
 
   callModule(page_311, id = "num_complaints_closed",
              coun_dist = reactive(input$coun_dist),
@@ -89,11 +117,13 @@ server <- function(input, output, session) {
 
   callModule(page_oem, id = "oem_incident",
              coun_dist = reactive(input$coun_dist),
-             week = reactive(input$week))
+             week = reactive(input$week),
+             snapshots_db)
 
   callModule(page_vacate, id = "hpd_vacate",
              coun_dist = reactive(input$coun_dist),
-             week = reactive(input$week))
+             week = reactive(input$week),
+             snapshots_db)
 
 
   output$pdf_report <- downloadHandler(

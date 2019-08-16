@@ -1,3 +1,17 @@
+#' Title
+#'
+#' @param p
+#' @param toolbar
+#' @param zoom
+#' @param legend
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#'
+#' @importFrom plotly ggplotly config layout hide_legend
 nycc_ggplotly <- function(p, toolbar = FALSE, zoom = FALSE, legend = FALSE, ...) {
   stopifnot(inherits(p, "gg"))
 
@@ -20,9 +34,19 @@ nycc_ggplotly <- function(p, toolbar = FALSE, zoom = FALSE, legend = FALSE, ...)
   p
 }
 
+#' Title
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#'
+#' @importFrom shiny reactiveValues isolate
+
 makeReactiveTrigger <- function() {
   rv <- reactiveValues(a = 0)
   list(
+
     depend = function() {
       rv$a
       invisible()

@@ -1,3 +1,13 @@
+#' Title
+#'
+#' @param id
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#'
+#' @import sf leaflet stringr purrr plotly shinycssloaders shinydashboard
 page_vacate_ui <- function(id) {
   ns <- NS(id)
 
@@ -16,7 +26,20 @@ page_vacate_ui <- function(id) {
   )
 }
 
-page_vacate <- function(input, output, session, coun_dist, week) {
+#' Title
+#'
+#' @param input
+#' @param output
+#' @param session
+#' @param coun_dist
+#' @param week
+#' @param snapshots_db
+#'
+#' @return
+#' @export
+#'
+#' @examples
+page_vacate <- function(input, output, session, coun_dist, week, snapshots_db) {
 
   ns <- session$ns
 

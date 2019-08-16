@@ -13,4 +13,4 @@
 #   rsconnect::deployApp(appName = app_name)
 # }
 
-rsconnect::deployApp(appName = "council_snapshots")
+# rsconnect::deployApp(appName = "council_snapshots")
