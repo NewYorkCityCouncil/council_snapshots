@@ -32,6 +32,9 @@ Imports: shiny,
     bookdown,
     rmarkdown,
     knitr,
-    scales
+    scales,
+    here,
+    rprojroot,
+    RPostgreSQL
 Remotes: newyorkcitycouncil/councildown
 RoxygenNote: 6.1.1
