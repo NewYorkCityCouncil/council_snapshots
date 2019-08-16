@@ -2,17 +2,28 @@
 % Please edit documentation in R/page_311.R
 \name{page_311}
 \alias{page_311}
-\title{Title}
+\title{Create module server function}
 \usage{
 page_311(input, output, session, coun_dist, week, open_calls = TRUE,
   current_week, snapshots_db)
 }
 \arguments{
-\item{snapshots_db}{}
+\item{input}{Shiny input}
+
+\item{output}{Shiny output}
+
+\item{session}{Shiny session}
+
+\item{coun_dist}{reactive value holding selected council district}
+
+\item{week}{reactive value holding selected week}
+
+\item{open_calls}{Show open or closed calls}
+
+\item{current_week}{Current week}
+
+\item{snapshots_db}{The pool object holding database connections}
 }
 \description{
-Title
-}
-\examples{
-
+Create module server function
 }

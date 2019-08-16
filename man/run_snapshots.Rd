@@ -2,10 +2,10 @@
 % Please edit documentation in R/run.R
 \name{run_snapshots}
 \alias{run_snapshots}
-\title{Title}
+\title{Run Council Snapshots App}
 \usage{
 run_snapshots()
 }
 \description{
-Title
+Run Council Snapshots App
 }

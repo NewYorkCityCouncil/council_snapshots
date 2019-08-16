@@ -2,16 +2,16 @@
 % Please edit documentation in R/page_oem.R
 \name{page_oem_ui}
 \alias{page_oem_ui}
-\title{Title}
+\title{OEM UI}
 \usage{
 page_oem_ui(id)
 }
 \arguments{
-\item{id}{}
+\item{id}{Unique id}
+}
+\value{
+A shiny UI
 }
 \description{
-Title
-}
-\examples{
-
+OEM UI
 }

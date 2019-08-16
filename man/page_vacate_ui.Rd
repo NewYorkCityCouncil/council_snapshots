@@ -2,16 +2,13 @@
 % Please edit documentation in R/page_vacate.R
 \name{page_vacate_ui}
 \alias{page_vacate_ui}
-\title{Title}
+\title{HPD Vacate Order UI}
 \usage{
 page_vacate_ui(id)
 }
 \arguments{
-\item{id}{}
+\item{id}{Unique ID}
 }
 \description{
-Title
-}
-\examples{
-
+HPD Vacate Order UI
 }

@@ -2,13 +2,23 @@
 % Please edit documentation in R/page_vacate.R
 \name{page_vacate}
 \alias{page_vacate}
-\title{Title}
+\title{HPD Vacate Order Server}
 \usage{
 page_vacate(input, output, session, coun_dist, week, snapshots_db)
 }
 \arguments{
-\item{snapshots_db}{}
+\item{input}{Shiny input}
+
+\item{output}{Shiny output}
+
+\item{session}{Shiny session}
+
+\item{coun_dist}{reactive value holding selected council district}
+
+\item{week}{reactive value holding selected week}
+
+\item{snapshots_db}{The pool object holding database connections}
 }
 \description{
-Title
+HPD Vacate Order Server
 }

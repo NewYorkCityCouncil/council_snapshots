@@ -1,12 +1,11 @@
-#' Title
+#' collect_geo
 #' Helper function to replace collect() when we need an sf dataframe
-#' @param x
-#' @param n
+#' @param x A \code{tbl}
+#' @param n Number of rows to collect. If \code{n} is NULL all rows are downloaded.
 #'
-#' @return
+#' @return A \code{sf} data frame.
 #' @export
 #'
-#' @examples
 #'
 #' @importFrom dplyr %>%
 collect_geo <- function(x, n = NULL) {

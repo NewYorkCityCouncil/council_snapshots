@@ -2,13 +2,13 @@
 % Please edit documentation in R/helpers.R
 \name{makeReactiveTrigger}
 \alias{makeReactiveTrigger}
-\title{Title}
+\title{makeReactiveTrigger}
 \usage{
 makeReactiveTrigger()
 }
-\description{
-Title
+\value{
+a list containing functions \code{depend()} and \code{trigger()}
 }
-\examples{
-
+\description{
+Manually tie together reactive expressions and observers
 }

@@ -2,16 +2,20 @@
 % Please edit documentation in R/connect_db.R
 \name{collect_geo}
 \alias{collect_geo}
-\title{Title}
+\title{collect_geo
+Helper function to replace collect() when we need an sf dataframe}
 \usage{
 collect_geo(x, n = NULL)
 }
 \arguments{
-\item{n}{}
+\item{x}{A \code{tbl}}
+
+\item{n}{Number of rows to collect. If \code{n} is NULL all rows are downloaded.}
+}
+\value{
+A \code{sf} data frame.
 }
 \description{
-Title
-}
-\examples{
-
+collect_geo
+Helper function to replace collect() when we need an sf dataframe
 }

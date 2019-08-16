@@ -1,21 +1,10 @@
-library(leaflet)
-library(stringr)
-library(purrr)
-library(plotly)
-library(shinycssloaders)
-
-
-
-# Create module ui
-#' Title
+#' 311 page UI
 #'
-#' @param id
-#' @param open_calls
+#' @param id Unique ID for each module instance
+#' @param open_calls Show open or closed calls?
 #'
-#' @return
+#' @return A shiny UI
 #' @export
-#'
-#' @examples
 #'
 #' @import sf leaflet stringr purrr plotly shinycssloaders
 page_311_ui <- function(id, open_calls = TRUE) {
@@ -46,25 +35,22 @@ page_311_ui <- function(id, open_calls = TRUE) {
   )
 }
 
-# Create module server function
-# Needs coun_dist and week global inputs (passed from callModule in main app)
-#' Title
+#' Create module server function
 #'
-#' @param input
-#' @param output
-#' @param session
-#' @param coun_dist
-#' @param week
-#' @param open_calls
-#' @param current_week
-#' @param snapshots_db
+#' @param input Shiny input
+#' @param output Shiny output
+#' @param session Shiny session
+#' @param coun_dist reactive value holding selected council district
+#' @param week reactive value holding selected week
+#' @param open_calls Show open or closed calls
+#' @param current_week Current week
+#' @param snapshots_db The pool object holding database connections
 #'
-#' @return
 #' @export
 #'
-#' @examples
 #'
-#' @import sf leaflet stringr purrr plotly shinycssloaders shinydashboard
+#' @import sf leaflet stringr purrr plotly shinycssloaders shinydashboard councildown dbplyr
+#' @importFrom stats reorder
 page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE, current_week, snapshots_db) {
 
   myTrigger <- makeReactiveTrigger()

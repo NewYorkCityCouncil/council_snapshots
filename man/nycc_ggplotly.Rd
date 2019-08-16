@@ -2,16 +2,24 @@
 % Please edit documentation in R/helpers.R
 \name{nycc_ggplotly}
 \alias{nycc_ggplotly}
-\title{Title}
+\title{nycc_ggplotly}
 \usage{
 nycc_ggplotly(p, toolbar = FALSE, zoom = FALSE, legend = FALSE, ...)
 }
 \arguments{
-\item{...}{}
+\item{p}{a ggplot}
+
+\item{toolbar}{include toolbar?}
+
+\item{zoom}{allow zooming?}
+
+\item{legend}{show legend?}
+
+\item{...}{further arguments passed to \code{ggplotly()}}
+}
+\value{
+a plotly htmlwidget
 }
 \description{
-Title
-}
-\examples{
-
+Create plotly plots that meet NYCC guidelines
 }

@@ -2,13 +2,16 @@
 % Please edit documentation in R/page_oem.R
 \name{Fmt}
 \alias{Fmt}
-\title{Title}
+\title{Difftime formaters}
 \usage{
 Fmt(x)
 }
 \arguments{
-\item{x}{}
+\item{x}{a difftime}
+}
+\value{
+Character vector
 }
 \description{
-Title
+Difftime formaters
 }

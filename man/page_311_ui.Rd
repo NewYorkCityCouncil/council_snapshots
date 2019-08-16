@@ -2,16 +2,18 @@
 % Please edit documentation in R/page_311.R
 \name{page_311_ui}
 \alias{page_311_ui}
-\title{Title}
+\title{311 page UI}
 \usage{
 page_311_ui(id, open_calls = TRUE)
 }
 \arguments{
-\item{open_calls}{}
+\item{id}{Unique ID for each module instance}
+
+\item{open_calls}{Show open or closed calls?}
+}
+\value{
+A shiny UI
 }
 \description{
-Title
-}
-\examples{
-
+311 page UI
 }

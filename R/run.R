@@ -1,9 +1,7 @@
-#' Title
+#' Run Council Snapshots App
 #'
-#' @return
 #' @export
 #'
-#' @examples
 run_snapshots <- function() {
-  shiny::runApp(system.file("app.R", package = "councilsnapshots"))
+  shiny::runApp(system.file("shinyApp/app.R", package = "councilsnapshots"))
 }

@@ -2,13 +2,23 @@
 % Please edit documentation in R/page_oem.R
 \name{page_oem}
 \alias{page_oem}
-\title{Title}
+\title{OEM Server}
 \usage{
 page_oem(input, output, session, week, coun_dist, snapshots_db)
 }
 \arguments{
-\item{snapshots_db}{}
+\item{input}{Shiny input}
+
+\item{output}{Shiny output}
+
+\item{session}{Shiny session}
+
+\item{week}{reactive value holding selected week}
+
+\item{coun_dist}{reactive value holding selected council district}
+
+\item{snapshots_db}{The pool object holding database connections}
 }
 \description{
-Title
+OEM Server
 }

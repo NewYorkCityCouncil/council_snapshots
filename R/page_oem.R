@@ -1,13 +1,11 @@
 
 
-#' Title
+#' OEM UI
 #'
-#' @param id
+#' @param id Unique id
 #'
-#' @return
+#' @return A shiny UI
 #' @export
-#'
-#' @examples
 #'
 #' @import sf leaflet stringr purrr plotly shinycssloaders shinydashboard
 page_oem_ui <- function(id) {
@@ -25,14 +23,13 @@ page_oem_ui <- function(id) {
   )
 }
 
-#' Title
+#' Difftime formaters
 #'
-#' @param x
+#' @param x a difftime
 #'
-#' @return
+#' @return Character vector
 #' @export
 #'
-#' @examples
 Fmt <- function(x) {
   UseMethod("Fmt")
 }
@@ -52,19 +49,17 @@ Fmt.default <- function(x) {
 }
 
 
-#' Title
+#' OEM Server
 #'
-#' @param input
-#' @param output
-#' @param session
-#' @param week
-#' @param coun_dist
-#' @param snapshots_db
+#' @param input Shiny input
+#' @param output Shiny output
+#' @param session Shiny session
+#' @param coun_dist reactive value holding selected council district
+#' @param week reactive value holding selected week
+#' @param snapshots_db The pool object holding database connections
 #'
-#' @return
 #' @export
 #'
-#' @examples
 page_oem <- function(input, output, session, week, coun_dist, snapshots_db) {
   dists <- tbl(snapshots_db, "council_districts") %>%
     collect_geo()
