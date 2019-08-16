@@ -35,6 +35,7 @@ Imports: shiny,
     scales,
     here,
     rprojroot,
-    RPostgreSQL
+    RPostgreSQL,
+    shinyBS
 Remotes: newyorkcitycouncil/councildown
 RoxygenNote: 6.1.1

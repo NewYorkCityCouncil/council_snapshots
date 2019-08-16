@@ -12,6 +12,7 @@ library(plotly)
 library(shinycssloaders)
 library(leaflet)
 library(councilsnapshots)
+library(shinyBS)
 
 # dir.create("~/.fonts")
 # file.copy("www/Open_Sans/OpenSans-Regular.ttf'", "~/.fonts")
@@ -110,14 +111,16 @@ server <- function(input, output, session) {
              week = reactive(input$week),
              open = TRUE,
              current_week = current_week,
-             snapshots_db)
+             weeks = weeks,
+             snapshots_db = snapshots_db)
 
   callModule(page_311, id = "num_complaints_closed",
              coun_dist = reactive(input$coun_dist),
              week = reactive(input$week),
              open = FALSE,
              current_week = current_week,
-             weeks = weeks)
+             weeks = weeks,
+             snapshots_db = snapshots_db)
 
   callModule(page_oem, id = "oem_incident",
              coun_dist = reactive(input$coun_dist),

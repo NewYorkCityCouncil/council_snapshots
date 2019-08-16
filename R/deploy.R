@@ -9,7 +9,7 @@
 #'
 #' @export
 deploy_shinyapps_io <- function(host = Sys.getenv("SNAPSHOTS_DB_HOST"),
-                                user = Sys.getenv("SNAPSHOTS_DB_HOST"),
+                                user = Sys.getenv("SNAPSHOTS_DB_USER"),
                                 password = Sys.getenv("SNAPSHOTS_DB_PW"),
                                 branchName = Sys.getenv("TRAVIS_BRANCH"),
                                 token = Sys.getenv("RSCONNECT_TOKEN"),
