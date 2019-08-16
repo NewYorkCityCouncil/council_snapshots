@@ -67,14 +67,16 @@ page_311_ui <- function(id, open_calls = TRUE) {
 #' @param week reactive value holding selected week
 #' @param open_calls Show open or closed calls
 #' @param current_week Current week
+#' @param weeks List of weeks
 #' @param snapshots_db The pool object holding database connections
+#' @param weeks
 #'
 #' @export
 #'
 #'
 #' @import sf leaflet stringr purrr plotly shinycssloaders shinydashboard councildown dbplyr
 #' @importFrom stats reorder
-page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE, current_week, snapshots_db) {
+page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE, current_week, weeks, snapshots_db) {
 
   myTrigger <- makeReactiveTrigger()
 
