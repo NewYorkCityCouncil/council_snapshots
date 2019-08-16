@@ -2,10 +2,28 @@
 % Please edit documentation in R/deploy.R
 \name{deploy_shinyapps_io}
 \alias{deploy_shinyapps_io}
-\title{Title}
+\title{Deploy to shinyapps.io from Travis}
 \usage{
-deploy_shinyapps_io()
+deploy_shinyapps_io(host = Sys.getenv("SNAPSHOTS_DB_HOST"),
+  user = Sys.getenv("SNAPSHOTS_DB_HOST"),
+  password = Sys.getenv("SNAPSHOTS_DB_PW"),
+  branchName = Sys.getenv("TRAVIS_BRANCH"),
+  token = Sys.getenv("RSCONNECT_TOKEN"),
+  secret = Sys.getenv("RSCONNECT_SECRET"))
+}
+\arguments{
+\item{host}{database hostname}
+
+\item{user}{database username}
+
+\item{password}{database password}
+
+\item{branchName}{branch being deployed from}
+
+\item{token}{rsconnect token}
+
+\item{secret}{rsconnect secret}
 }
 \description{
-Title
+Deploy to shinyapps.io from Travis
 }
