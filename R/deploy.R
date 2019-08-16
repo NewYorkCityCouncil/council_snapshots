@@ -14,3 +14,13 @@
 # }
 
 # rsconnect::deployApp(appName = "council_snapshots")
+
+#' Title
+#'
+#' @return
+#' @export
+#'
+#' @examples
+deploy_shinyapps_io <- function() {
+  rsconnect::deployApp(appDir = system.file("shinyApp", package = "councilsnapshots"))
+}

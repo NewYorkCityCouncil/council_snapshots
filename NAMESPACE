@@ -2,6 +2,7 @@
 
 export(Fmt)
 export(collect_geo)
+export(deploy_shinyapps_io)
 export(makeReactiveTrigger)
 export(nycc_ggplotly)
 export(page_311)
