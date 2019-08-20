@@ -22,11 +22,9 @@ page_311(input, output, session, coun_dist, week, open_calls = TRUE,
 
 \item{current_week}{Current week}
 
-\item{weeks}{List of weeks}
+\item{weeks}{Data frame of week labels}
 
 \item{snapshots_db}{The pool object holding database connections}
-
-\item{weeks}{Data frame of week labels}
 }
 \description{
 Create module server function

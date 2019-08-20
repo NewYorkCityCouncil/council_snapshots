@@ -67,7 +67,6 @@ page_311_ui <- function(id, open_calls = TRUE) {
 #' @param week reactive value holding selected week
 #' @param open_calls Show open or closed calls
 #' @param current_week Current week
-#' @param weeks List of weeks
 #' @param snapshots_db The pool object holding database connections
 #' @param weeks Data frame of week labels
 #'
