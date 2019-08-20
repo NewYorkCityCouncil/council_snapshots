@@ -46,6 +46,7 @@ library(stringr)
 library(leaflet)
 library(stringr)
 library(purrr)
+library(sf)
 
 utils <- list.files(path = "util", pattern = "\\.(R|r)$", full.names = TRUE)
 lapply(utils, source)
