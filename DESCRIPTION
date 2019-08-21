@@ -9,7 +9,7 @@ Authors@R: c(person("Nick", "Solomon", email = "nsolomon@council.nyc.gov",
 BugReports: https://github.com/NewYorkCityCouncil/council_snapshots/issues
 Description: This package contains the shiny app Council Snapshots, along with
     code for deploying the app to shinyapps.io using travis.
-License: MIT + file LICENSE
+License: file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: shiny,
@@ -42,3 +42,6 @@ Imports: shiny,
     shinyBS
 Remotes: newyorkcitycouncil/councildown
 RoxygenNote: 6.1.1
+Suggests: 
+    testthat,
+    shinytest
