@@ -71,7 +71,7 @@ header <- dashboardHeader(title = "")
 sidebar <- dashboardSidebar(
   selectInput("coun_dist", "Council district", 1:51, selected = 1),
   selectInput("week", "Week", week_labels, selected = current_week),
-  sidebarMenu(
+  sidebarMenu(id = "tabs",
     menuItem("311", icon = icon("phone"),
              menuSubItem("Submitted service requests", "311_opened"),
              menuSubItem("Closed service requests", "311_closed")),
