@@ -184,7 +184,7 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
       mutate(lon = st_coordinates(.)[,1], lat = st_coordinates(.)[,2]) %>%
       as.data.frame() %>%
       group_by(lon, lat, complaint_type) %>%
-      summarize(n = n(), created_date = paste0(scales::date_format(format = "%b %e %Y %I:%M %p")(sort(created_date)), collapse = "<br>"),
+      summarize(n = n(), created_date = paste0(pretty_created, collapse = "<br>"),
                 incident_address = paste0(unique(incident_address), collapse = "<br>")) %>%
       st_as_sf(coords = c("lon", "lat"), crs = st_crs(dist_week()))
   })
