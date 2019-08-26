@@ -38,6 +38,7 @@ onStop(function() {
   poolClose(snapshots_db)
 })
 
+
 test_q <- "select * from pg_locks inner join
 (select oid from pg_class where relname in (select matviewname from pg_matviews)) tmp
 on pg_locks.relation = tmp.oid;"
