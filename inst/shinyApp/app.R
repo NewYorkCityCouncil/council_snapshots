@@ -161,7 +161,7 @@ if(nrow(DBI::dbGetQuery(snapshots_db, test_q)) > 0) {
         # Set up parameters to pass to Rmd document
         params <- list(coun_dist = input$coun_dist,
                        week = input$week,
-                       pretty_week = weeks$label[weeks$week_n == input$week])
+                       pretty_week =2)
 
         # Knit the document, passing in the `params` list, and eval it in a
         # child of the global environment (this isolates the code in the document
