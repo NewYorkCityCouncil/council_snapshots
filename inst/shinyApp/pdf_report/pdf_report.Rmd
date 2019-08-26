@@ -26,7 +26,6 @@ header-includes:
 
 ```{r include = FALSE}
 library(ggplot2)
-library(flextable)
 # library(councildown)
 
 knitr::knit_hooks$set(embed = councildown::hook_pdfembed)
