@@ -1,0 +1,47 @@
+Package: councilsnapshots
+Type: Package
+Title: Council Snapshots
+Version: 0.1.0.9000
+Authors@R: c(person("Nick", "Solomon", email = "nsolomon@council.nyc.gov",
+    role = c("aut", "cre")),
+    person("Rose", "Martinez", email = "romartinez@council.nyc.gov",
+    role = c("aut")))
+BugReports: https://github.com/NewYorkCityCouncil/council_snapshots/issues
+Description: This package contains the shiny app Council Snapshots, along with
+    code for deploying the app to shinyapps.io using travis.
+License: file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports: shiny,
+    remotes,
+    dplyr,
+    ggplot2,
+    plotly,
+    sf,
+    leaflet,
+    stringr,
+    purrr,
+    shinycssloaders,
+    shinydashboard,
+    tibble,
+    lubridate,
+    extrafont,
+    webshot,
+    pool,
+    rsconnect,
+    DT,
+    councildown,
+    dbplyr,
+    bookdown,
+    rmarkdown,
+    knitr,
+    scales,
+    here,
+    rprojroot,
+    RPostgreSQL,
+    shinyBS
+Remotes: newyorkcitycouncil/councildown
+RoxygenNote: 6.1.1
+Suggests: 
+    testthat,
+    shinytest

@@ -1,11 +1,26 @@
+#' HPD Vacate Order UI
+#'
+#' @param id Unique ID
+#'
+#' @export
+#'
+#' @import sf leaflet stringr purrr plotly shinycssloaders shinydashboard
 page_vacate_ui <- function(id) {
   ns <- NS(id)
 
   fluidPage(
     fluidRow(
-      box(title = "Issued vacate orders",
+      box(title = tagList("Issued vacate orders",
+                          help_tooltip(ns("issued-vacate-map"),
+                                       "Vacate orders issued this week",
+                                       paste("Here are the locations of each of the vacate",
+                                             "orders issued this week."))),
           leafletOutput(ns("issued_vacate")) %>% withSpinner()),
-      box(title = "Rescinded vacate orders",
+      box(title = tagList("Rescinded vacate orders",
+                          help_tooltip(ns("rescinded-vacate-map"),
+                                       "Vacate orders rescinded this week",
+                                       paste("Here are the locations of each of the vacate",
+                                             "orders rescinded this week."))),
           leafletOutput(ns("rescinded_vacate")) %>% withSpinner())
     ),
 
@@ -16,7 +31,18 @@ page_vacate_ui <- function(id) {
   )
 }
 
-page_vacate <- function(input, output, session, coun_dist, week) {
+#' HPD Vacate Order Server
+#'
+#' @param input Shiny input
+#' @param output Shiny output
+#' @param session Shiny session
+#' @param coun_dist reactive value holding selected council district
+#' @param week reactive value holding selected week
+#' @param snapshots_db The pool object holding database connections
+#'
+#' @export
+#'
+page_vacate <- function(input, output, session, coun_dist, week, snapshots_db) {
 
   ns <- session$ns
 
@@ -93,19 +119,33 @@ page_vacate <- function(input, output, session, coun_dist, week) {
 
   output$issued_table <- renderUI({
     if (nrow(issued_week_dist()) > 0) {
-      box(title = "Issued vacate orders",
+      box(title = tagList("Issued vacate orders",
+                          help_tooltip(ns("issued-vacate-table"),
+                                       "Vacate orders issued this week",
+                                       paste("More details about each of the vacate",
+                                             "orders issued this week."))),
           DT::dataTableOutput(ns("issued_table_output")))
     } else {
-      box(title = "No vacate orders issued")
+      box(title = tagList("No vacate orders issued",
+                          help_tooltip(ns("no-issued-vacate-table"),
+                                       "No vacate orders issued this week",
+                                       paste("Many weeks don't contain any vacate orders."))))
     }
   })
 
   output$rescinded_table <- renderUI({
     if (nrow(rescinded_week_dist()) > 0) {
-      box(title = "Rescinded vacate orders",
+      box(title = tagList("Rescinded vacate orders",
+                          help_tooltip(ns("rescinded-vacate-table"),
+                                       "Vacate orders rescinded this week",
+                                       paste("More details about each of the vacate",
+                                             "orders rescinded this week."))),
           DT::dataTableOutput(ns("rescinded_table_output")))
     } else {
-      box(title = "No vacate orders rescinded")
+      box(title = tagList("No vacate orders rescinded",
+                          help_tooltip(ns("no-rescinded-vacate-table"),
+                                       "No vacate orders rescinded this week",
+                                       paste("Many weeks do not contain any vacate orders."))))
     }
   })
 
@@ -115,7 +155,9 @@ page_vacate <- function(input, output, session, coun_dist, week) {
     issued_week_dist() %>%
       as.data.frame() %>%
       select(address, primary_vacate_reason, vacate_type, vacate_effective_date, number_of_vacated_units) %>%
-      DT::datatable(options = list(scrollX = TRUE, scrollY = TRUE))
+      DT::datatable(colnames = c("Address", "Vacate reason", "Order type",
+                                 "Effective date", "Number of vacated units"),
+                    options = list(scrollX = TRUE, scrollY = TRUE))
   })
 
   output$rescinded_table_output <- DT::renderDataTable({
@@ -123,7 +165,10 @@ page_vacate <- function(input, output, session, coun_dist, week) {
 
     rescinded_week_dist() %>%
       as.data.frame() %>%
-      select(address, primary_vacate_reason, vacate_type, vacate_effective_date, number_of_vacated_units) %>%
-      DT::datatable(options = list(scrollX = TRUE, scrollY = TRUE))
+      select(address, primary_vacate_reason, vacate_type, vacate_effective_date, rescind_date, number_of_vacated_units) %>%
+      DT::datatable(colnames = c("Address", "Vacate reason", "Order type",
+                                 "Effective date", "Rescinded date",
+                                 "Number of vacated units"),
+                    options = list(scrollX = TRUE, scrollY = TRUE))
   })
 }

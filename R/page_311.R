@@ -1,10 +1,12 @@
-library(leaflet)
-library(stringr)
-library(purrr)
-library(plotly)
-library(shinycssloaders)
-
-# Create module ui
+#' 311 page UI
+#'
+#' @param id Unique ID for each module instance
+#' @param open_calls Show open or closed calls?
+#'
+#' @return A shiny UI
+#' @export
+#'
+#' @import sf leaflet stringr purrr plotly shinycssloaders shinyBS
 page_311_ui <- function(id, open_calls = TRUE) {
 
   # Namespace for module
@@ -12,12 +14,24 @@ page_311_ui <- function(id, open_calls = TRUE) {
 
   fluidPage(
     # Row to hold plots
-    h3("This week:"),
+    uiOutput(ns("week_header")),
     fluidRow(
-      box(title = "Top service requests", solidHeader = TRUE,
+      box(title = tagList("Top service requests",
+                          help_tooltip(ns("top-sr"),
+                                       "See the top service requests",
+                                       paste("These are the most common service requests",
+                                             ifelse(open_calls, "opened", "closed"),
+                                             "this week. Click a bar to filter the map."))), solidHeader = TRUE,
           plotlyOutput(ns("complaint_type_cd_week"), height = "420px") %>% withSpinner()
       ),
-      box(title = "Service request locations", solidHeader = TRUE,
+      box(title = tagList("Service request locations",
+                          help_tooltip(ns("sr-locations"),
+                                       "Find 311 requests in your district",
+                                       paste("This map shows the location of different 311",
+                                             "service requests. Size shows how many requests",
+                                             "were made at that location and color shows the request type.",
+                                             "Click the points for more info."))),
+          solidHeader = TRUE,
           leafletOutput(ns("complaint_map")) %>% withSpinner(),
           actionLink(ns("reset_map"), "Reset map")
           # uiOutput(ns("map_legend"))
@@ -25,43 +39,71 @@ page_311_ui <- function(id, open_calls = TRUE) {
     ),
     h3("Year to date:"),
     fluidRow(
-      box(title = "Top service requests", solidHeader = TRUE,
+      box(title = tagList("Top service requests",
+                          help_tooltip(ns("top-sr-ytd"),
+                                       "Top service requests this year",
+                                       paste("These are the most common service requests",
+                                             ifelse(open_calls, "opened", "closed"),
+                                             "this year."))), solidHeader = TRUE,
           plotlyOutput(ns("complaint_type_cd_ytd")) %>% withSpinner()),
-      box(title = "Number of service requests per week", solidHeader = TRUE,
+      box(title = tagList("Number of service requests per week",
+                          help_tooltip(ns("total-sr-ytd"),
+                                       "All service requests",
+                                       paste("Here is the total number of service requests",
+                                             ifelse(open_calls, "opened", "closed"),
+                                             "this year, regardless of type."))),
+          solidHeader = TRUE,
           plotlyOutput(ns("complaint_num_cd_ytd")) %>% withSpinner())
     )
   )
 }
 
-# Create module server function
-# Needs coun_dist and week global inputs (passed from callModule in main app)
-page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE, current_week) {
+#' Create module server function
+#'
+#' @param input Shiny input
+#' @param output Shiny output
+#' @param session Shiny session
+#' @param coun_dist reactive value holding selected council district
+#' @param week reactive value holding selected week
+#' @param open_calls Show open or closed calls
+#' @param current_week Current week
+#' @param snapshots_db The pool object holding database connections
+#' @param weeks Data frame of week labels
+#'
+#' @export
+#'
+#'
+#' @import sf leaflet stringr purrr plotly shinycssloaders shinydashboard councildown dbplyr
+#' @importFrom stats reorder
+page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE, current_week, weeks, snapshots_db) {
 
   myTrigger <- makeReactiveTrigger()
 
   make_popup <- function(incident_type, num, address, created_dates) {
 
-    one_popup <- function(incident_type, num, address, created_dates){
-      type_out <- h5(incident_type)
+    type_out <- paste0("<h5>", incident_type, "</h5>")
 
-      num_out <- tags$small(tags$em(num, " incident(s)"))
+    num_out <- paste0("<small><em>", num, " incident(s)", "</em></small>")
 
-      address_out <- tags$small(tags$em(address))
+    address_out <- paste0("<small><em>", address, "</em></small>")
 
-      out <- paste0(type_out, "<br>",
-                   address_out, "<br>",
-                   num_out,
-                   tags$hr(),
-                   tags$strong("Created:"), "<br>",
-                   created_dates)
+    out <- paste(type_out,
+                 address_out,
+                 paste(num_out,
+                 tags$hr(),
+                 tags$strong("Created:")),
+                 created_dates, sep = "<br>")
 
-      councildown::councilPopup(out)
-    }
-
-    pmap_chr(list(incident_type, num, address, created_dates), one_popup)
+    out
   }
 
   # Get the data for the selected district and week
+
+  output$week_header <- renderUI({
+    this_week <- weeks$label[which(weeks$week_n == week())]
+
+    h3("Week of", this_week)
+  })
 
   if (open_calls) {
 
@@ -142,7 +184,7 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
       mutate(lon = st_coordinates(.)[,1], lat = st_coordinates(.)[,2]) %>%
       as.data.frame() %>%
       group_by(lon, lat, complaint_type) %>%
-      summarize(n = n(), created_date = paste0(scales::date_format(format = "%b %e %Y %I:%M %p")(sort(created_date)), collapse = "<br>"),
+      summarize(n = n(), created_date = paste0(pretty_created, collapse = "<br>"),
                 incident_address = paste0(unique(incident_address), collapse = "<br>")) %>%
       st_as_sf(coords = c("lon", "lat"), crs = st_crs(dist_week()))
   })
@@ -313,4 +355,3 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
 
   })
 }
-

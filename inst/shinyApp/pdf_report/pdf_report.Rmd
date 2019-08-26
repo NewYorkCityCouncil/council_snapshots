@@ -48,6 +48,7 @@ library(stringr)
 library(leaflet)
 library(stringr)
 library(purrr)
+library(sf)
 
 utils <- list.files(path = "util", pattern = "\\.(R|r)$", full.names = TRUE)
 lapply(utils, source)
@@ -355,7 +356,7 @@ issued_week_dist <- tbl(snapshots_db, "vacate_orders") %>%
 
 ```{r screenshot.force = TRUE}
 if (nrow(issued_week_dist) > 0) {
-  bbox <- as.numeric(st_bbox(issued_week_dist()))
+  bbox <- as.numeric(st_bbox(issued_week_dist))
   
   issued_week_dist %>% 
     leaflet() %>%
