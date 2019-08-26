@@ -1,9 +1,11 @@
 ---
-title: "Council district `r params$coun_dist`: `r params$week`"
-author: "Data Operations Unit"
-date: '`r councildown::pretty_date()`'
+title: "Council Snapshots"
+subtitle: "District `r params$coun_dist`: Week of `r params$pretty_week`"
+# author: "Data Operations Unit"
+date: "Generated on: `r councildown::pretty_date()`"
 output:
   bookdown::word_document2:
+    toc: yes
     reference_docx: assets/word_theme.docx
   # bookdown::pdf_document2: default
   # councildown::council_pdf:
@@ -16,6 +18,7 @@ always_allow_html: yes
 params:
   week: NA
   coun_dist: NA
+  pretty_week: NA
 header-includes:
   - \usepackage{lscape}
 ---
@@ -79,7 +82,8 @@ Fmt.default <- function(x) {
 
 ```
 
-# 311 service requests
+
+# 311 Service Requests ^[Note: 311 Service Requests data is representative of the population that makes a service request. Generalizations can't be made for the entire city or district population.]
 
 ## Submitted Service Requests
 
@@ -182,12 +186,13 @@ dist_all %>%
   theme_bw()
 ```
 
+
 ```{r}
 setProgress(.2)
 ```
 
 
-## Closed service requests
+## Closed Service Requests
 
 ```{r}
 dist_week <- tbl(snapshots_db, "sr_ind_top_10_week_district_closed") %>%
@@ -292,7 +297,8 @@ dist_all %>%
 setProgress(.4)
 ```
 
-# OEM incidents
+
+# OEM Incidents^[Note: Emergency Response Incidents are emergencies that NYCEM responded to. There are 13 emergency categories to date: Administration, Aviation, Fire, HazMat, Law Enforcement, Marine, Medical, Rescue, Structural, Transportation, Utility, Weather and Other.]
 
 ```{r}
 oem_week_dist <- tbl(snapshots_db, "emergency_response") %>%
@@ -327,7 +333,7 @@ if (nrow(oem_week_dist) > 0){
   oem_week_dist %>%
     as.data.frame() %>%
     select(incident_type, location, creation_date, closed_date) %>%
-    knitr::kable()
+    knitr::kable(col.names = c('Incident','Location', 'Start Time', 'Closed'))
 }
 ```
 
@@ -338,12 +344,12 @@ setProgress(.6)
 ```
 
 
-# HPD vacate orders
+# HPD Vacate Orders
 
-## Issued vacate orders
+## Issued Vacate Orders
 
 
-```{r}
+```{r include=FALSE}
 issued_week_dist <- tbl(snapshots_db, "vacate_orders") %>%
   filter(council_district == local(coun_dist),
          date_part("week", vacate_effective_date) == local(week)) %>%
@@ -374,7 +380,7 @@ if (nrow(issued_week_dist) > 0) {
   issued_week_dist %>%
     as.data.frame() %>%
     select(address, primary_vacate_reason, vacate_type, vacate_effective_date, number_of_vacated_units) %>%
-    knitr::kable()
+    knitr::kable(col.names = c('Address','Vacate Reason','Type', 'Effective Date', 'Units Vacated'))
 }
 ```
 
@@ -385,9 +391,9 @@ setProgress(.8)
 ```
 
 
-## Rescinded vacate orders
+## Rescinded Vacate Orders
 
-```{r}
+```{r include = FALSE}
 rescinded_week_dist <- tbl(snapshots_db, "vacate_orders") %>%
   filter(council_district == local(coun_dist),
          date_part("week", rescind_date) == local(week)) %>%
@@ -417,12 +423,20 @@ if (nrow(rescinded_week_dist) > 0) {
   rescinded_week_dist %>%
     as.data.frame() %>%
     select(address, primary_vacate_reason, vacate_type, vacate_effective_date, number_of_vacated_units) %>%
-    knitr::kable()
+    knitr::kable(col.names = c('Address','Vacate Reason','Type', 'Effective Date', 'Units Vacated'))
 }
 ```
 
 `r if (nrow(rescinded_week_dist) == 0) {"No rescinded vacate orders."}`
 
+
+# Sources
+**311 Service Requests**, NYC OpenData: 311, DoITT, https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9
+
+**Emergency Response Incidents**, NYC OpenData: NYCEM, https://data.cityofnewyork.us/Public-Safety/Emergency-Response-Incidents/pasr-j7fb
+
+**Order to Repair/Vacate Orders**, NYC OpenData: HPD, https://data.cityofnewyork.us/Housing-Development/Order-to-Repair-Vacate-Orders/tb8q-a3ar
 ```{r}
 setProgress(.9)
 ```
+
