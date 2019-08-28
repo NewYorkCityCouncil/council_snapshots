@@ -80,7 +80,8 @@ page_oem <- function(input, output, session, week, coun_dist, snapshots_db) {
 
   oem_week_dist <- reactive({
     tbl(snapshots_db, "emergency_response") %>%
-      filter(date_part("week", creation_date) == local(week())) %>%
+      filter(date_part("week", creation_date) == local(week()),
+             date_part("year", creation_date) == 2019) %>%
       collect_geo() %>%
       st_join(dists) %>%
       filter(coun_dist == coun_dist()) %>%
