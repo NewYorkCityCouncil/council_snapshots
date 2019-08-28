@@ -129,7 +129,7 @@ page_vacate <- function(input, output, session, coun_dist, week, snapshots_db) {
       box(title = tagList("No vacate orders issued",
                           help_tooltip(ns("no-issued-vacate-table"),
                                        "No vacate orders issued this week",
-                                       paste("Many weeks don't contain any vacate orders."))))
+                                       paste("Many weeks do not contain any vacate orders."))))
     }
   })
 
