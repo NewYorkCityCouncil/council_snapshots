@@ -52,7 +52,8 @@ page_vacate <- function(input, output, session, coun_dist, week, snapshots_db) {
   issued_week_dist <- reactive({
     tbl(snapshots_db, "vacate_orders") %>%
       filter(council_district == local(coun_dist()),
-             date_part("week", vacate_effective_date) == local(week())) %>%
+             date_part("week", vacate_effective_date) == local(week()),
+             date_part("year", vacate_effective_date) == 2019) %>%
       mutate(address = paste(number, street)) %>%
       collect_geo()
 
@@ -61,7 +62,8 @@ page_vacate <- function(input, output, session, coun_dist, week, snapshots_db) {
   rescinded_week_dist <- reactive({
     tbl(snapshots_db, "vacate_orders") %>%
       filter(council_district == local(coun_dist()),
-             date_part("week", rescind_date) == local(week())) %>%
+             date_part("week", rescind_date) == local(week()),
+             date_part("year", rescind_date) == 2019) %>%
       mutate(address = paste(number, street)) %>%
       collect_geo()
   })
