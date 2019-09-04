@@ -82,12 +82,13 @@ if(nrow(DBI::dbGetQuery(snapshots_db, test_q)) > 0) {
     selectInput("coun_dist", "Council district", 1:51, selected = 1),
     selectInput("week", "Week", week_labels, selected = current_week),
     sidebarMenu(id = "tabs",
+                menuItem("About", icon = icon("home"), tabName = "landing_tab"),
                 menuItem("311", icon = icon("phone"),
                          menuSubItem("Submitted service requests", "311_opened"),
                          menuSubItem("Closed service requests", "311_closed")),
                 menuItem("OEM", icon = icon("warning"),
                          menuSubItem("Emergency incidents", "oem_created")),
-                menuItem("HPD", icon = icon("home"),
+                menuItem("HPD", icon = icon("building"),
                          menuSubItem("Vacate orders", "vacate_issued"))
     ),
     tipify(downloadButton("pdf_report", label = "Download",
@@ -100,6 +101,9 @@ if(nrow(DBI::dbGetQuery(snapshots_db, test_q)) > 0) {
               # tags$script(async = NA, src="https://www.googletagmanager.com/gtag/js?id=UA-111461633-2"),
               includeScript("analytics.js")),
     tabItems(
+      tabItem("landing_tab",
+              page_landing_ui("landing_page")
+      ),
       tabItem("311_opened",
               page_311_ui("num_complaints")
       ),
@@ -142,6 +146,7 @@ if(nrow(DBI::dbGetQuery(snapshots_db, test_q)) > 0) {
                week = reactive(input$week),
                snapshots_db)
 
+    callModule(page_landing, id = "landing_page")
 
     output$pdf_report <- downloadHandler(
       # For PDF output, change this to "report.pdf"
