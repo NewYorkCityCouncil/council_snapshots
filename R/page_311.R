@@ -101,8 +101,11 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
 
   output$week_header <- renderUI({
     this_week <- weeks$label[which(weeks$week_n == week())]
-
-    h3("Week of", this_week)
+    if (open_calls) {
+      h3("Open 311 Calls, Week of", this_week)
+    } else {
+      h3("Closed 311 Calls, Week of", this_week)
+    }
   })
 
   if (open_calls) {
@@ -137,6 +140,7 @@ page_311 <- function(input, output, session, coun_dist, week, open_calls = TRUE,
         collect_geo()
     })
   }
+
   # Create bar chart
   output$complaint_type_cd_week <- renderPlotly({
     p <- dist_week() %>%
