@@ -6,5 +6,5 @@ globalVariables(c(".","NS","actionLink","address","aes","bsPopover","closed_date
                   "number_of_vacated_units","observe","observeEvent","primary_vacate_reason",
                   "pull","reactive","renderUI","req","rescind_date","scale_fill_gradient",
                   "scale_x_discrete","span","street","summarize","tagList","tags","tbl","uiOutput",
-                  "vacate_effective_date","vacate_type","weeks","ymd"))
+                  "vacate_effective_date","vacate_type","weeks","ymd", "pretty_created"))
 
