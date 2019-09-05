@@ -31,7 +31,7 @@ deploy_shinyapps_io <- function(host = Sys.getenv("SNAPSHOTS_DB_HOST"),
 
   # Create app name so I can stage branches
   clean_name <- function(str) {
-    gsub("[^a-zA-Z0-9_\\-]", "", str)
+    gsub("[^a-zA-Z0-9_\\-]", "-", str)
   }
 
   if(branchName == "master") {
