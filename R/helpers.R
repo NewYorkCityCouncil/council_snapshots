@@ -62,6 +62,11 @@ makeReactiveTrigger <- function() {
 
 
 help_tooltip <- function(id, title, content) {
+
+  if(grepl("'", title) | grepl("'", content)) {
+    stop("Apostrophes are not supported by bsPopover")
+  }
+
   tagList(
     span(style = "position:absolute;right:10px;bottom:10px",
       id = id,
