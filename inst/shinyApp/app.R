@@ -13,6 +13,9 @@ library(shinycssloaders)
 library(leaflet)
 library(councilsnapshots)
 library(shinyBS)
+library(shinydashboardPlus)
+library(shinyjs)
+library(shinyLP)
 
 # dir.create("~/.fonts")
 # file.copy("www/Open_Sans/OpenSans-Regular.ttf'", "~/.fonts")
@@ -78,7 +81,7 @@ if(nrow(DBI::dbGetQuery(snapshots_db, test_q)) > 0) {
 
   header <- dashboardHeader(title = "")
 
-  sidebar <- dashboardSidebar(
+  sidebar <- dashboardSidebar(useShinyjs(),
     selectInput("coun_dist", "Council district", 1:51, selected = 1),
     selectInput("week", "Week", week_labels, selected = current_week),
     sidebarMenu(id = "tabs",
@@ -93,8 +96,10 @@ if(nrow(DBI::dbGetQuery(snapshots_db, test_q)) > 0) {
     ),
     tipify(downloadButton("pdf_report", label = "Download",
                           style = "background-color: #fff;color: #444;display: block;margin: 12px 15px 0px 15px;"),
-           "Download a printable copy of this dashboard in Microsoft Word format.")
+           "Download a printable copy of this dashboard in Microsoft Word format."),
+    collapsed = TRUE
   )
+
 
   body <- dashboardBody(
     tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "council.css"),
