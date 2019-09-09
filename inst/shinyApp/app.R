@@ -13,9 +13,7 @@ library(shinycssloaders)
 library(leaflet)
 library(councilsnapshots)
 library(shinyBS)
-library(shinydashboardPlus)
-library(shinyjs)
-library(shinyLP)
+
 
 # dir.create("~/.fonts")
 # file.copy("www/Open_Sans/OpenSans-Regular.ttf'", "~/.fonts")
@@ -81,7 +79,7 @@ if(nrow(DBI::dbGetQuery(snapshots_db, test_q)) > 0) {
 
   header <- dashboardHeader(title = "")
 
-  sidebar <- dashboardSidebar(useShinyjs(),
+  sidebar <- dashboardSidebar(
     selectInput("coun_dist", "Council district", 1:51, selected = 1),
     selectInput("week", "Week", week_labels, selected = current_week),
     sidebarMenu(id = "tabs",
