@@ -4,7 +4,10 @@
 \alias{run_snapshots}
 \title{Run Council Snapshots App}
 \usage{
-run_snapshots()
+run_snapshots(...)
+}
+\arguments{
+\item{...}{Further parameters passed to runApp}
 }
 \description{
 Run Council Snapshots App
