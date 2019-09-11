@@ -52,6 +52,4 @@ deploy_shinyapps_io <- function(host = Sys.getenv("SNAPSHOTS_DB_HOST"),
                             secret=secret)
   rsconnect::deployApp(appDir = system.file("shinyApp", package = "councilsnapshots"),
                        appName = appName)
-  print(rsconnect::showLogs(appPath = system.file("shinyApp", package = "councilsnapshots"),
-                            appName = appName))
 }
