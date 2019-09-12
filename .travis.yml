@@ -8,8 +8,17 @@ before_install:
   - sudo apt-get update
   - sudo apt-get install -y libudunits2-dev
   - sudo apt-get install -y libgdal-dev
+install:
+- R -e 'devtools::install_deps(dep = T)'
+
+script:
+- R CMD build .
+- R CMD check *tar.gz
+- Rscript -e "remotes::install_github('newyorkcitycouncil/council_snapshots', ref = Sys.getenv('TRAVIS_COMMIT'))"
+- Rscript -e "devtools::test()"
+
 deploy:
   provider: script
-  script: Rscript -e "remotes::install_github('newyorkcitycouncil/council_snapshots', ref = Sys.getenv('TRAVIS_COMMIT'));councilsnapshots::deploy_shinyapps_io()"
+  script: Rscript -e "councilsnapshots::deploy_shinyapps_io()"
   on:
     all_branches: true
