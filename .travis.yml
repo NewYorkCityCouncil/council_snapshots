@@ -14,7 +14,7 @@ install:
 
 script:
 - R CMD build .
-- R CMD check *tar.gz
+- R CMD check --no-tests *tar.gz
 - Rscript -e "remotes::install_github('newyorkcitycouncil/council_snapshots', ref = Sys.getenv('TRAVIS_COMMIT'))"
 - Rscript -e "devtools::test()"
 
