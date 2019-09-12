@@ -3,17 +3,13 @@
 language: R
 sudo: false
 cache: packages
-r_check_args: '--as-cran --no-tests'
 before_install:
   - sudo apt-get clean
   - sudo apt-get update
   - sudo apt-get install -y libudunits2-dev
-script:
-- Rscript -e "remotes::install_github('newyorkcitycouncil/council_snapshots', ref = Sys.getenv('TRAVIS_COMMIT'))"
-- Rscript -e "devtools::test(stop_on_failure = TRUE)"
-
+  - sudo apt-get install -y libgdal-dev
 deploy:
   provider: script
-  script: Rscript -e "councilsnapshots::deploy_shinyapps_io()"
+  script: Rscript -e "remotes::install_github('newyorkcitycouncil/council_snapshots', ref = Sys.getenv('TRAVIS_COMMIT'));councilsnapshots::deploy_shinyapps_io()"
   on:
     all_branches: true
