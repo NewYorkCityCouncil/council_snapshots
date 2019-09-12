@@ -42,3 +42,6 @@ Imports: shiny,
     shinyBS
 Remotes: newyorkcitycouncil/councildown
 RoxygenNote: 6.1.1
+Suggests: 
+    testthat,
+    Rselenium
